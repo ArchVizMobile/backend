@@ -24,13 +24,13 @@ class Server(BaseHTTPRequestHandler):
         self.end_headers()
         if self.path.endswith("/"):
             try:
-                walls,roomz,_ = getData()
+                walls,junctions,_ = getData()
             except:
-                walls,roomz,walls = "no"
+                walls,junctions,walls = "no"
             self.wfile.write(json.dumps({
                 "success": walls!="no",
                 "walls": walls,
-                "roomz": roomz,
+                "junctions": junctions,
             }).encode())
             return
         if self.path.endswith("/dash.html"):
