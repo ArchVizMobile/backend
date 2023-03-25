@@ -1,5 +1,3 @@
-import numpy as np
-from PIL import Image, ImageDraw
 import random
 from config import CONFIG
 
