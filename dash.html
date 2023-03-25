@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #container {
+            position: relative;
+        }
+        #list {
+            position: absolute;
+            left: 1200px
+        }
+        #list div {
+            height: 30px;
+            line-height: 30px;
+        }
+        .wall {
+            position: absolute;
+            background: #000
+        }
+        .wall.active {
+            background: #f00 !important;
+            z-index: 100;
+        }
+        .wall.outer {
+            background: #00f;
+            z-index: 100;
+        }
+        #info {
+            position: absolute;
+            top:20px;
+            left:20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <div id="list"></div>
+    <div id="info"></div>
+    <script>
+        setTimeout(()=>{
+            // fetch("http://127.0.0.1:1234/")
+            fetch("http://api.lisha-app.com:1234/")
+                // .then(e=>({ret:e.json(),e}))
+                .then(async e=>{
+                    const ret = await e.json()
+                    console.log({response:ret.walls,e})
+                    document.querySelector("#info").innerHTML = `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} - ${e.url}`
+                    document.getElementById("container").innerHTML = ret.walls.map((item,idx)=>{
+                        return `<div data-wall="${idx}" class="wall ${item.isOuterWall?"outer":""}" style="
+                            top: ${item.from.y}px;
+                            left: ${item.from.x}px;
+                            width: ${!item.isHorizontal?5:Math.abs(item.to.x - item.from.x)}px;
+                            height: ${item.isHorizontal?5:Math.abs(item.to.y - item.from.y)}px
+                        "></div>`
+                    }).join("")
+                    ret.walls.map((item,idx)=>{
+                        const el = document.createElement("div")
+                        el.innerHTML = `
+                            top: ${item.from.y}px;
+                            left: ${item.from.x}px;`
+                        el.addEventListener("mouseenter",(e)=>{
+                            // console.log("mouseenter",e,el,item,idx)
+                            const g = document.querySelectorAll(`[data-wall].active`)
+                            if(g.length)
+                                for(let n=0;n<g.length;n++){
+                                    g[n].classList.remove("active")
+                                }
+                            document.querySelector(`[data-wall="${idx}"]`).classList.add("active")
+                        })
+                        document.getElementById("list").append(el)
+                    })
+                })
+        },1000)
+    </script>
+</body>
+</html>
