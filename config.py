@@ -10,6 +10,7 @@ class Config:
     _SAVE_STATIC:bool = True
     _VERTICAL_ROOMZ_COUNT:int = 0
     _HORIZOHNTAHL_ROOMZ_COUNT:int = 0
+    _WALL_WIDTH:int = 0
     def __init__(self) -> None:
         self._IMAGE_WIDTH = int(os.environ.get("IMAGE_WIDTH")),
         self._IMAGE_HEIGHT = int(os.environ.get("IMAGE_HEIGHT")),
@@ -18,6 +19,7 @@ class Config:
         self._SAVE_STATIC = os.environ.get("SAVE_STATIC").lower()=="true",
         self._VERTICAL_ROOMZ_COUNT = int(os.environ.get("VERTICAL_ROOMZ_COUNT")),
         self._HORIZOHNTAHL_ROOMZ_COUNT = int(os.environ.get("HORIZOHNTAHL_ROOMZ_COUNT")),
+        self._WALL_WIDTH = int(os.environ.get("WALL_WIDTH")),
     def __str__(self) -> str:
         return f"IMAGE_WIDTH={self._IMAGE_WIDTH[0]} - IMAGE_HEIGHT={self._IMAGE_HEIGHT[0]} - SERVER_PORT={self._SERVER_PORT[0]} - SAVE_TEMP={self._SAVE_TEMP[0]} - SAVE_STATIC={self._SAVE_STATIC[0]} - VERTICAL_ROOMZ_COUNT={self._VERTICAL_ROOMZ_COUNT[0]} - HORIZOHNTAHL_ROOMZ_COUNT={self._HORIZOHNTAHL_ROOMZ_COUNT[0]}"
 
@@ -41,6 +43,9 @@ class Config:
 
     def getHORIZOHNTAHL_ROOMZ_COUNT(self)->int:
         return self._HORIZOHNTAHL_ROOMZ_COUNT[0]
+
+    def getWALL_WIDTH(self)->int:
+        return self._WALL_WIDTH[0]
 
 
 CONFIG = Config()
