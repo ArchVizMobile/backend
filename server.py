@@ -2,6 +2,7 @@ from http.server import BaseHTTPRequestHandler,HTTPServer
 import json
 
 from data import getData
+from config import CONFIG
 
 class Server(BaseHTTPRequestHandler):
     
@@ -39,7 +40,7 @@ class Server(BaseHTTPRequestHandler):
         self.wfile.write("no".encode())
 
 
-def run(server_class=HTTPServer, handler_class=Server, port=1234):
+def run(server_class=HTTPServer, handler_class=Server, port=CONFIG.SERVER_PORT):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
 

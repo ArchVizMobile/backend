@@ -4,8 +4,8 @@ import random
 from config import CONFIG
 
 def getData():
-    w = CONFIG["IMAGE_WIDTH"]
-    h = CONFIG["IMAGE_HEIGHT"]
+    w = CONFIG.getIMAGE_WIDTH()
+    h = CONFIG.getIMAGE_HEIGHT()
 
     wall_width = 0
     wall_width_half = wall_width/2
@@ -14,8 +14,8 @@ def getData():
     rooms = [
         [[100,100,True,"#000000"]],
     ]
-    vertical_roomz_count = CONFIG["VERTICAL_ROOMZ_COUNT"]
-    horizohntahl_roomz_count = CONFIG["HORIZOHNTAHL_ROOMZ_COUNT"]
+    vertical_roomz_count = CONFIG.getVERTICAL_ROOMZ_COUNT()
+    horizohntahl_roomz_count = CONFIG.getHORIZOHNTAHL_ROOMZ_COUNT()
 
     for a in range(horizohntahl_roomz_count):
         if random.random() > 0.5:

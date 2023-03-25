@@ -4,8 +4,8 @@ import time
 from config import CONFIG
 
 def draw(walls):
-    w = CONFIG["IMAGE_WIDTH"]
-    h = CONFIG["IMAGE_HEIGHT"]
+    w = CONFIG.getIMAGE_WIDTH()
+    h = CONFIG.getIMAGE_HEIGHT()
     img = np.zeros([h,w,3],dtype=np.uint8)
     img.fill(255) # numpy array!
     im = Image.fromarray(img) #convert numpy array to image
@@ -39,9 +39,9 @@ def draw(walls):
                 (r[0]-wall_width_half, r[1]-wall_width_half),
                 (r[0]+wall_width_half, r[1]+wall_width_half),
             ], fill = "#000")
-    if CONFIG["SAVE_STATIC"]:
+    if CONFIG.getSAVE_STATIC():
         filename = f"images/{time.time()}.jpg"
         im.save(filename)
-    if CONFIG["SAVE_TEMP"]:
+    if CONFIG.getSAVE_TEMP():
         im.save("whh.jpg")
 
