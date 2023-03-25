@@ -24,10 +24,9 @@ class Server(BaseHTTPRequestHandler):
         self.end_headers()
         if self.path.endswith("/"):
             try:
-                walls,roomz = getData()
+                walls,roomz,_ = getData()
             except:
-                walls = "no"
-                roomz = "no"
+                walls,roomz,walls = "no"
             self.wfile.write(json.dumps({
                 "success": walls!="no",
                 "walls": walls,
@@ -40,7 +39,7 @@ class Server(BaseHTTPRequestHandler):
         self.wfile.write("no".encode())
 
 
-def run(server_class=HTTPServer, handler_class=Server, port=CONFIG.SERVER_PORT):
+def run(server_class=HTTPServer, handler_class=Server, port=CONFIG.getSERVER_PORT()):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
 

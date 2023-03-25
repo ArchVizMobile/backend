@@ -70,7 +70,6 @@ def getData():
     # print(f'vertical_roomz_count= {vertical_roomz_count} ; horizohntahl_roomz_count= {horizohntahl_roomz_count} ; rooms= {rooms}')
 
     for idx,row in enumerate(rooms):
-        # print(f"{len(row)} row {row}")
         if len(row) == 1:
             print(f"deleting row {row}")
             del rooms[idx][0]
@@ -78,7 +77,6 @@ def getData():
     for y in rooms:
         y.sort(key = lambda x: x[0])
 
-    # print(rooms)
     rooms = [[[100, 100, True, '#000000'], [294, 100, True, '#000000'], [563, 100, True, '#000000']], [[100, 415, True, '#000000'], [100, 415, False, '#000000'], [294, 415, False, '#000000'], [398, 415, True, '#000000'], [563, 415, False, '#000000'], [592, 415, True, '#000000']], [[100, 750, True, '#000000'], [100, 750, False, '#000000'], [398, 750, False, '#000000'], [446, 750, True, '#000000'], [592, 750, False, '#000000'], [738, 750, True, '#000000']], [[100, 982, True, '#000000'], [100, 982, False, '#000000'], [444, 982, True, '#000000'], [446, 982, False, '#000000'], [659, 982, True, '#000000'], [738, 982, False, '#000000']], [[100, 982, True, '#000000'], [100, 982, False, '#000000'], [444, 982, True, '#000000'], [446, 982, False, '#000000'], [659, 982, True, '#000000'], [738, 982, False, '#000000']], [[100, 1070, False, '#000000'], [444, 1070, False, '#000000'], [659, 1070, False, '#000000']]]
 
     for idx,room in enumerate(rooms):
@@ -90,19 +88,16 @@ def getData():
         for idx1,room1 in enumerate(room):
             for idx2,room2 in enumerate(room):
                 if idx1!=idx2 and room1[0]==room2[0] and room1[1]==room2[1]:
-                    # print(f"deleting double {room2}")
                     del room[idx2]
-            # if idx1!=idx and room == json.dumps(room1):
-                # del room1
     
 
-    roomz = []
+    joints = []
     for idx,y in enumerate(rooms):
         for xidx,x in enumerate(y):
-            roomz.append({"left":x[0],"top":x[1],"corner":{"top":False,"left":False,"bottom":False,"right":False}})
+            joints.append({"left":x[0],"top":x[1],"corner":{"top":False,"left":False,"bottom":False,"right":False}})
 
-    for idx,room in enumerate(roomz):
-        for idx1,room1 in enumerate(roomz):
+    for idx,room in enumerate(joints):
+        for idx1,room1 in enumerate(joints):
             if idx!=idx1:
                 if room["left"] > room1["left"]:
                     room["corner"]["left"]=True
@@ -112,20 +107,18 @@ def getData():
                     room["corner"]["top"]=True
                 if room["top"] < room1["top"]:
                     room["corner"]["bottom"]=True
-                # if room[0]
 
-    walls = []
+    wallsarr = []
 
     for yidx,y in enumerate(rooms):
         for xidx,x in enumerate(y):
-            # print(f"y={yidx} x={xidx}")
             if xidx+1 < len(y):
                 outline = yidx==0 or yidx==len(rooms)-1
                 wall = [[
                     [x[0]-wall_width_half,x[1]+wall_width_half],
                     [y[xidx+1][0]+wall_width_half,y[xidx+1][1]-wall_width_half],
                 ],True,outline]
-                walls.append(wall)
+                wallsarr.append(wall)
             if yidx+1 < len(rooms):
                 for tidx,t in enumerate(rooms[yidx+1]):
                     if x[0] == t[0] and x[1] != t[1]:
@@ -134,13 +127,13 @@ def getData():
                             [x[0]+wall_width_half,x[1]-wall_width_half],
                             [t[0]-wall_width_half,t[1]+wall_width_half],
                         ],False,outline]
-                        walls.append(wall)
+                        wallsarr.append(wall)
 
 
-    returnwalls = []
+    wallsobj = []
 
-    for idx,wall in enumerate(walls):
-        returnwalls.append({
+    for idx,wall in enumerate(wallsarr):
+        wallsobj.append({
             "from": {
                 "x": int(wall[0][0][0]),
                 "y": int(wall[0][0][1])
@@ -153,4 +146,4 @@ def getData():
             "isOuterWall": wall[2],
         })
 
-    return returnwalls,roomz,walls
+    return wallsobj,joints,wallsarr
