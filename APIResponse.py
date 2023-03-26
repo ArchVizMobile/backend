@@ -12,7 +12,15 @@ class Position:
     def __str__(self) -> str:
         return jsonpickle.encode(self, unpicklable=False)
 
-class Door:
+class SimplePosition:
+    def __init__(self,fromPosition:int,toPosition:int) -> None:
+        self.fromPosition = fromPosition
+        self.toPosition = toPosition
+        pass
+    def __str__(self) -> str:
+        return jsonpickle.encode(self, unpicklable=False)
+
+class Door(SimplePosition):
     def __init__(self,fromPosition:int,toPosition:int,hinge:int,openLeft:bool,style:str) -> None:
         self.fromPosition = fromPosition
         self.toPosition = toPosition
@@ -23,7 +31,7 @@ class Door:
     def __str__(self) -> str:
         return jsonpickle.encode(self, unpicklable=False)
 
-class Window:
+class Window(SimplePosition):
     def __init__(self,fromPosition:int,toPosition:int,style:str) -> None:
         self.fromPosition = fromPosition
         self.toPosition = toPosition
@@ -32,7 +40,7 @@ class Window:
     def __str__(self) -> str:
         return jsonpickle.encode(self, unpicklable=False)
 
-class Wall:
+class Wall(SimplePosition):
     def __init__(self,fromPosition:Position,toPosition:Position,isHorizontal:bool,isOuterWall:bool,doors:List[Door],windows:List[Window]) -> None:
         self.fromPosition = fromPosition
         self.toPosition = toPosition
