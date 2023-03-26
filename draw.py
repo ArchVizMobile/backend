@@ -1,10 +1,13 @@
 import json
+from typing import List
+import jsonpickle
 import numpy as np
 from PIL import Image, ImageDraw,ImageFont
 import time
+from APIResponse import Wall
 from config import CONFIG
 
-def draw(walls,junctions,wallsobj):
+def draw(walls,junctions,wallsobj:List[Wall]):
     w = CONFIG.getIMAGE_WIDTH()
     h = CONFIG.getIMAGE_HEIGHT()
     img = np.zeros([h,w,3],dtype=np.uint8)
@@ -17,30 +20,37 @@ def draw(walls,junctions,wallsobj):
 
     for idx,wall in enumerate(wallsobj):
         fill = "#000"
-        if wall["isOuterWall"]:
+        if wall.isOuterWall:
             fill = "#999"
-        img1.rectangle([(wall["from"]["x"],wall["from"]["y"]),(wall["to"]["x"],wall["to"]["y"])], fill)
-        if wall["isHorizontal"]:
+        img1.rectangle([(wall.fromPosition.x,wall.fromPosition.y),(wall.toPosition.x,wall.toPosition.y)], fill)
+        if wall.isHorizontal:
             # print(wall)
-            for door in wall["doors"]:
-                # img1.rectangle([
-                #     # +(door["width"] if door["hinge"][0] else 0)
-                #     (door["from"]["x"],door["from"]["y"]),
-                #     (door["to"]["x"],door["to"]["y"])
-                # ], fill="#f00")
-                # if door["hinge"][0]:
-                # img1.rectangle([
-                #     # +(door["width"] if door["hinge"][0] else 0)
-                #     (
-                #         door["from"]["x"]+(0 if door["hinge"][0] else door["width"]),
-                #         door["from"]["y"]+(10 if door["hinge"][2] else door["width"])-10
-                #     ),
-                #     (
-                #         door["from"]["x"]+10+(0 if door["hinge"][0] else door["width"]),
-                #         door["from"]["y"]+10+(10 if door["hinge"][2] else door["width"])-10
-                #     )
-                # ], fill="#000")
-                print(door)
+            fr = [wall.fromPosition.x,wall.fromPosition.y]
+            to = [wall.fromPosition.x,wall.fromPosition.y]
+
+            frHinge = [wall.fromPosition.x,wall.fromPosition.y]
+            toHinge = [wall.fromPosition.x,wall.fromPosition.y]
+
+            for door in wall.doors:
+                if wall.isHorizontal:
+                    
+                    frHinge[0] = frHinge[0] + door.hinge
+                    toHinge[0] = toHinge[0] + door.hinge+wall_width
+                    toHinge[1] = toHinge[1] + wall_width
+
+                    fr[0] = fr[0] + door.fromPosition
+                    to[0] = to[0] + door.toPosition
+                    to[1] = to[1] + wall_width
+                else:
+                    frHinge[1] = frHinge[1] + door.hinge
+                    toHinge[1] = toHinge[1] + door.hinge+wall_width
+                    toHinge[0] = toHinge[0] + wall_width
+
+                    fr[1] = fr[1] + door.fromPosition
+                    to[1] = to[1] + door.toPosition
+                    to[0] = to[0] + wall_width
+                img1.rectangle([tuple(fr),tuple(to)], fill="#f00")
+                img1.rectangle([tuple(frHinge),tuple(toHinge)], fill="#000")
 
     # print(json.dumps(junctions))
 
