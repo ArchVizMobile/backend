@@ -170,11 +170,12 @@ def getData():
 
         if checkVertical:
             fromPosition = random.randrange(10,o.toPosition.y-o.fromPosition.y - 20 - doorWidth)
+            hinge = fromPosition if random.random() > 0.5 else toPosition
             o.doors.append(Door(
                 fromPosition = fromPosition,
                 toPosition = doorWidth + fromPosition,
-                hinge = 50,
-                openLeft = True,
+                hinge = hinge,
+                openLeft = random.random() > 0.5,
                 style = "default"
             ))
 
@@ -185,8 +186,8 @@ def getData():
             o.doors.append(Door(
                 fromPosition = fromPosition,
                 toPosition = toPosition,
-                hinge = fromPosition,
-                openLeft = True,
+                hinge = hinge,
+                openLeft = random.random() > 0.5,
                 style = "default"
             ))
 
