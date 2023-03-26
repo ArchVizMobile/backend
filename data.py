@@ -1,8 +1,27 @@
 import random
 from typing import List
-from APIResponse import APIResponse, Door, Position, Wall, Window
+from APIResponse import APIResponse, Door, Position, SimplePosition, Wall, Window
 from config import CONFIG
 from generateCorners import generateCorners
+
+# a <= x <= b
+def between(a,x,b):
+    return a <= x and x <= b
+
+def betweenPosition(pos,item):
+    return between(item.fromPosition,pos,item.toPosition)
+
+def checkIntersecting(arr:List[SimplePosition],fr:int,to:int):
+    for item in arr:
+        currentInItem = betweenPosition(fr,item) or \
+                        betweenPosition(to,item)
+        
+        itemInCurrent = between(item.fromPosition,fr,item.toPosition) or \
+                        between(item.fromPosition,to,item.toPosition)
+        if currentInItem or itemInCurrent:
+            return True
+    return False
+
 
 def getData():
     response = APIResponse(success=False,junctions=[],walls=[])
@@ -154,61 +173,102 @@ def getData():
         ))
     
     outerwalls = []
+    innerwalls = []
     for idx,wall in enumerate(wallsobj):
         if wall.isOuterWall:
             outerwalls.append({"idx":idx,"wall":wall})
+        else:
+            innerwalls.append({"idx":idx,"wall":wall})
 
-    # for n in range(int(random.random()*3)):
-    for n in range(10):
+    # outer walls doors
+    for _ in range(10):
         idx = random.randrange(0,len(outerwalls))
         o:Wall = wallsobj[outerwalls[idx]["idx"]]
 
         doorWidth = int(random.randrange(80,120))
 
-        checkVertical = not o.isHorizontal and len(o.doors)==0 and o.toPosition.y-o.fromPosition.y > doorWidth*2
-        checkHorizontal = o.isHorizontal and len(o.doors)==0 and o.toPosition.x-o.fromPosition.x > doorWidth*2
+        checkVertical = not o.isHorizontal and len(o.doors)==0 and len(o.windows)==0 and o.toPosition.y-o.fromPosition.y > doorWidth*2
+        checkHorizontal = o.isHorizontal and len(o.doors)==0 and len(o.windows)==0 and o.toPosition.x-o.fromPosition.x > doorWidth*2
 
         if checkVertical:
             fromPosition = random.randrange(10,o.toPosition.y-o.fromPosition.y - 20 - doorWidth)
-            toPosition = fromPosition + doorWidth
-            hinge = fromPosition if random.random() > 0.5 else toPosition
-            o.doors.append(Door(
-                fromPosition = fromPosition,
-                toPosition = toPosition,
-                hinge = hinge,
-                openLeft = random.random() > 0.5,
-                style = "default"
-            ))
 
         if checkHorizontal:
             fromPosition = random.randrange(10,o.toPosition.x-o.fromPosition.x - 20 - doorWidth)
+
+        if checkVertical or checkHorizontal:
             toPosition = fromPosition + doorWidth
             hinge = fromPosition if random.random() > 0.5 else toPosition
-            o.doors.append(Door(
-                fromPosition = fromPosition,
-                toPosition = toPosition,
-                hinge = hinge,
-                openLeft = random.random() > 0.5,
-                style = "default"
-            ))
+            intersecting = checkIntersecting(o.doors,fromPosition,toPosition) or \
+                            checkIntersecting(o.windows,fromPosition,toPosition)
 
-    for n in range(10):
+            if not intersecting:
+                o.doors.append(Door(
+                    fromPosition = fromPosition,
+                    toPosition = toPosition,
+                    hinge = hinge,
+                    openLeft = random.random() > 0.5,
+                    style = "default"
+                ))
+
+    # outer walls windows
+    for _ in range(100):
         idx = random.randrange(0,len(outerwalls))
         o:Wall = wallsobj[outerwalls[idx]["idx"]]
 
         doorWidth = int(random.randrange(80,120))
 
-        checkVertical = not o.isHorizontal and len(o.doors)==0 and o.toPosition.y-o.fromPosition.y > doorWidth*2
-        checkHorizontal = o.isHorizontal and len(o.doors)==0 and o.toPosition.x-o.fromPosition.x > doorWidth*2
+        checkVertical = not o.isHorizontal and len(o.doors)==0 and len(o.windows)==0 and o.toPosition.y-o.fromPosition.y > doorWidth*2
+        checkHorizontal = o.isHorizontal and len(o.doors)==0 and len(o.windows)==0 and o.toPosition.x-o.fromPosition.x > doorWidth*2
+
+        if checkVertical:
+            fromPosition = random.randrange(10,o.toPosition.y-o.fromPosition.y - 20 - doorWidth)
+
+        if checkHorizontal:
+            fromPosition = random.randrange(10,o.toPosition.x-o.fromPosition.x - 20 - doorWidth)
 
         if checkVertical or checkHorizontal:
-            o.windows.append(Window(
-                fromPosition = 50,
-                toPosition = doorWidth + 50,
-                style = "default"
-            ))
+            toPosition = fromPosition + doorWidth
+            intersecting = checkIntersecting(o.doors,fromPosition,toPosition) or \
+                            checkIntersecting(o.windows,fromPosition,toPosition)
 
-    # print(outerwalls)
+            if not intersecting:
+                o.windows.append(Window(
+                    fromPosition = fromPosition,
+                    toPosition = toPosition,
+                    style = "default"
+                ))
+
+    # inner walls
+    for wall in innerwalls:
+        o:Wall = wallsobj[wall["idx"]]
+
+        doorWidth = int(random.randrange(80,120))
+
+        checkVertical = not o.isHorizontal and o.toPosition.y-o.fromPosition.y > doorWidth*2
+        checkHorizontal = o.isHorizontal and o.toPosition.x-o.fromPosition.x > doorWidth*2
+
+        if checkVertical:
+            fromPosition = random.randrange(10,o.toPosition.y-o.fromPosition.y - 20 - doorWidth)
+
+        if checkHorizontal:
+            fromPosition = random.randrange(10,o.toPosition.x-o.fromPosition.x - 20 - doorWidth)
+
+        if checkVertical or checkHorizontal:
+            toPosition = fromPosition + doorWidth
+            hinge = fromPosition if random.random() > 0.5 else toPosition
+            intersecting = checkIntersecting(o.doors,fromPosition,toPosition) or \
+                            checkIntersecting(o.windows,fromPosition,toPosition)
+
+            if not intersecting:
+                o.doors.append(Door(
+                    fromPosition = fromPosition,
+                    toPosition = toPosition,
+                    hinge = hinge,
+                    openLeft = random.random() > 0.5,
+                    style = "default"
+                ))
+
 
     response.walls = wallsobj
 
