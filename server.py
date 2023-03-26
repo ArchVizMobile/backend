@@ -28,7 +28,7 @@ class Server(BaseHTTPRequestHandler):
             try:
                 walls,junctions,_ = getData()
             except:
-                walls,junctions,walls = "no"
+                walls,junctions = "no","no"
             self.wfile.write(jsonpickle.encode({
                 "success": walls!="no",
                 "walls": walls,
