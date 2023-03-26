@@ -24,16 +24,16 @@ def draw(walls,junctions,wallsobj:List[Wall]):
             fill = "#999"
         img1.rectangle([(wall.fromPosition.x,wall.fromPosition.y),(wall.toPosition.x,wall.toPosition.y)], fill)
 
-        fr = [wall.fromPosition.x,wall.fromPosition.y]
-        to = [wall.fromPosition.x,wall.fromPosition.y]
-
-        frHinge = [wall.fromPosition.x,wall.fromPosition.y]
-        toHinge = [wall.fromPosition.x,wall.fromPosition.y]
-
-        frOpen = [wall.fromPosition.x,wall.fromPosition.y]
-        toOpen = [wall.fromPosition.x,wall.fromPosition.y]
-
         for door in wall.doors:
+            fr = [wall.fromPosition.x,wall.fromPosition.y]
+            to = [wall.fromPosition.x,wall.fromPosition.y]
+
+            frHinge = [wall.fromPosition.x,wall.fromPosition.y]
+            toHinge = [wall.fromPosition.x,wall.fromPosition.y]
+
+            frOpen = [wall.fromPosition.x,wall.fromPosition.y]
+            toOpen = [wall.fromPosition.x,wall.fromPosition.y]
+
             if wall.isHorizontal:
                 
                 frHinge[0] = frHinge[0] + door.hinge + (wall_width if door.hinge==door.fromPosition else 0)
@@ -66,6 +66,22 @@ def draw(walls,junctions,wallsobj:List[Wall]):
             img1.rectangle([tuple(fr),tuple(to)], fill="#f00")
             img1.rectangle([tuple(frHinge),tuple(toHinge)], fill="#000")
             img1.rectangle([tuple(frOpen),tuple(toOpen)], fill="#f00")
+
+        for window in wall.windows:
+            fr = [wall.fromPosition.x,wall.fromPosition.y]
+            to = [wall.fromPosition.x,wall.fromPosition.y]
+            if wall.isHorizontal:
+                
+                fr[0] = fr[0] + window.fromPosition
+                to[0] = to[0] + window.toPosition
+                to[1] = to[1] + wall_width
+
+            else:
+                fr[0] = fr[0] - wall_width
+                fr[1] = fr[1] + window.fromPosition
+                to[1] = to[1] + window.toPosition
+
+            img1.rectangle([tuple(fr),tuple(to)], fill="#00f")
 
 
 
