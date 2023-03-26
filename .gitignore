@@ -2,3 +2,4 @@
 *.csv
 *.jpg
 __pycache__
+.env
