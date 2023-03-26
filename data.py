@@ -1,80 +1,16 @@
-import json
 import random
+from typing import List
+from APIResponse import APIResponse, Position, Wall
 from config import CONFIG
+from generateCorners import generateCorners
 
 def getData():
-    w = CONFIG.getIMAGE_WIDTH()
-    h = CONFIG.getIMAGE_HEIGHT()
+    response = APIResponse(success=False,junctions=[],walls=[])
+
+    rooms = generateCorners()
 
     wall_width = CONFIG.getWALL_WIDTH()
     wall_width_half = wall_width/2
-
-
-    rooms = [
-        [[100,100,True,"#000000"]],
-    ]
-    vertical_roomz_count = CONFIG.getVERTICAL_ROOMZ_COUNT()
-    horizohntahl_roomz_count = CONFIG.getHORIZOHNTAHL_ROOMZ_COUNT()
-
-    for a in range(horizohntahl_roomz_count):
-        if random.random() > 0.3:
-            min = round(rooms[0][len(rooms[0])-1][0]+(h/(horizohntahl_roomz_count*2)))
-            max = round(rooms[0][len(rooms[0])-1][0]+(h/horizohntahl_roomz_count))
-            rooms[0].append([
-                int(random.randrange(min,max)),
-                rooms[0][0][1],
-                True,
-                "#000000"
-            ])
-
-    for n in range(vertical_roomz_count):
-        last_room = rooms[len(rooms)-1][0]
-        min = round(last_room[1]+(h/(vertical_roomz_count*2)))
-        max = round(last_room[1]+(h/vertical_roomz_count))
-        r = [[
-                last_room[0],
-                int(random.randrange(min,max)),
-                True,
-                "#000000"
-            ]]
-        for a in range(horizohntahl_roomz_count):
-            if random.random() > 0.3:
-                min = round(r[len(r)-1][0]+(h/(horizohntahl_roomz_count*2)))
-                max = round(r[len(r)-1][0]+(h/horizohntahl_roomz_count))
-                r.append([
-                    int(random.randrange(min,max)),
-                    r[len(r)-1][1],
-                    True,
-                    "#000000"
-                ])
-        rooms.append(r)
-
-    for idx,y in enumerate(rooms):
-        if idx<len(rooms)-1:
-            for x in y:
-                if x[2]:
-                    rooms[idx+1].append([x[0],rooms[idx+1][0][1],False,"#000000"])
-
-    last_y = int(rooms[len(rooms)-1][0][1]+100)
-    if last_y > h-10:
-        last_y = h - 10
-
-    r = []
-    for idx,x in enumerate(rooms[len(rooms)-1]):
-        if x[2]:
-            # print(x)
-            r.append([x[0],last_y,False,"#000000"])
-    rooms.append(r)
-
-    # print(f'vertical_roomz_count= {vertical_roomz_count} ; horizohntahl_roomz_count= {horizohntahl_roomz_count} ; rooms= {rooms}')
-
-    for idx,row in enumerate(rooms):
-        if len(row) == 1:
-            print(f"deleting row {row}")
-            del rooms[idx][0]
-
-    for y in rooms:
-        y.sort(key = lambda x: x[0])
 
     # rooms = [[[100, 100, True, '#000000'], [294, 100, True, '#000000'], [563, 100, True, '#000000']], [[100, 415, True, '#000000'], [100, 415, False, '#000000'], [294, 415, False, '#000000'], [398, 415, True, '#000000'], [563, 415, False, '#000000'], [592, 415, True, '#000000']], [[100, 750, True, '#000000'], [100, 750, False, '#000000'], [398, 750, False, '#000000'], [446, 750, True, '#000000'], [592, 750, False, '#000000'], [738, 750, True, '#000000']], [[100, 982, True, '#000000'], [100, 982, False, '#000000'], [444, 982, True, '#000000'], [446, 982, False, '#000000'], [659, 982, True, '#000000'], [738, 982, False, '#000000']], [[100, 982, True, '#000000'], [100, 982, False, '#000000'], [444, 982, True, '#000000'], [446, 982, False, '#000000'], [659, 982, True, '#000000'], [738, 982, False, '#000000']], [[100, 1070, False, '#000000'], [444, 1070, False, '#000000'], [659, 1070, False, '#000000']]]
     # print(rooms)
@@ -205,23 +141,17 @@ def getData():
             wallsarr.append(wall)
     
 
-    wallsobj = []
+    wallsobj:List[Wall] = []
 
     for idx,wall in enumerate(wallsarr):
-        wallsobj.append({
-            "from": {
-                "x": int(wall[0][0][0]),
-                "y": int(wall[0][0][1])
-            },
-            "to": {
-                "x": int(wall[0][1][0]),
-                "y": int(wall[0][1][1])
-            },
-            "isHorizontal": wall[1],
-            "isOuterWall": wall[2],
-            "windows":[],
-            "doors":[],
-        })
+        wallsobj.append(Wall(
+            fromPosition=Position(int(wall[0][0][0]),int(wall[0][0][1])),
+            toPosition=Position(int(wall[0][1][0]),int(wall[0][1][1])),
+            isHorizontal=wall[1],
+            isOuterWall=wall[2],
+            doors=[],
+            windows=[]
+        ))
     
     outerwalls = []
     for idx,wall in enumerate(wallsobj):
@@ -232,28 +162,39 @@ def getData():
     for n in range(10):
         idx = random.randrange(0,len(outerwalls))
         o = wallsobj[outerwalls[idx]["idx"]]
-        # top left, right, bottom right, left
-        openSide = [False,False,False,False]
-        openSide[int(random.random()*4)] = True
 
         doorWidth = int(random.randrange(80,120))
 
-        if not o["isHorizontal"] and len(o["doors"])==0 and o["to"]["y"]-o["from"]["y"] > doorWidth*2:
+        checkVertical = not o["isHorizontal"] and len(o["doors"])==0 and o["to"]["y"]-o["from"]["y"] > doorWidth*2
+        checkHorizontal = o["isHorizontal"] and len(o["doors"])==0 and o["to"]["x"]-o["from"]["x"] > doorWidth*2
+
+        if checkVertical or checkHorizontal:
             o["doors"].append({
                 "from": 50,
                 "to": doorWidth + 50,
-                "hinge":openSide,
-                "width":doorWidth
+                "hinge": 50,
+                "openLeft": True,
+                "style": "default"
             })
 
-        if o["isHorizontal"] and len(o["doors"])==0 and o["to"]["x"]-o["from"]["x"] > doorWidth*2:
-            o["doors"].append({
+    for n in range(10):
+        idx = random.randrange(0,len(outerwalls))
+        o = wallsobj[outerwalls[idx]["idx"]]
+
+        doorWidth = int(random.randrange(80,120))
+
+        checkVertical = not o["isHorizontal"] and len(o["doors"])==0 and o["to"]["y"]-o["from"]["y"] > doorWidth*2
+        checkHorizontal = o["isHorizontal"] and len(o["doors"])==0 and o["to"]["x"]-o["from"]["x"] > doorWidth*2
+
+        if checkVertical or checkHorizontal:
+            o["windows"].append({
                 "from": 50,
                 "to": doorWidth + 50,
-                "hinge":openSide,
-                "width":doorWidth
+                "style": "default"
             })
 
     # print(outerwalls)
+
+    response.walls = wallsobj
 
     return wallsobj,joints,wallsarr
