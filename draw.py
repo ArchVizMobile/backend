@@ -23,50 +23,53 @@ def draw(walls,junctions,wallsobj:List[Wall]):
         if wall.isOuterWall:
             fill = "#999"
         img1.rectangle([(wall.fromPosition.x,wall.fromPosition.y),(wall.toPosition.x,wall.toPosition.y)], fill)
-        if wall.isHorizontal:
-            # print(wall)
-            fr = [wall.fromPosition.x,wall.fromPosition.y]
-            to = [wall.fromPosition.x,wall.fromPosition.y]
 
-            frHinge = [wall.fromPosition.x,wall.fromPosition.y]
-            toHinge = [wall.fromPosition.x,wall.fromPosition.y]
+        fr = [wall.fromPosition.x,wall.fromPosition.y]
+        to = [wall.fromPosition.x,wall.fromPosition.y]
 
-            frOpen = [wall.fromPosition.x,wall.fromPosition.y]
-            toOpen = [wall.fromPosition.x,wall.fromPosition.y]
+        frHinge = [wall.fromPosition.x,wall.fromPosition.y]
+        toHinge = [wall.fromPosition.x,wall.fromPosition.y]
 
-            for door in wall.doors:
-                if wall.isHorizontal:
-                    
-                    frHinge[0] = frHinge[0] + door.hinge + (wall_width if door.hinge==door.fromPosition else 0)
-                    toHinge[0] = toHinge[0] + door.hinge + (-wall_width if door.hinge!=door.fromPosition else 0)
-                    toHinge[1] = toHinge[1] + wall_width
+        frOpen = [wall.fromPosition.x,wall.fromPosition.y]
+        toOpen = [wall.fromPosition.x,wall.fromPosition.y]
 
-                    fr[0] = fr[0] + door.fromPosition
-                    to[0] = to[0] + door.toPosition
-                    to[1] = to[1] + wall_width
+        for door in wall.doors:
+            if wall.isHorizontal:
+                
+                frHinge[0] = frHinge[0] + door.hinge + (wall_width if door.hinge==door.fromPosition else 0)
+                toHinge[0] = toHinge[0] + door.hinge + (-wall_width if door.hinge!=door.fromPosition else 0)
+                toHinge[1] = toHinge[1] + wall_width
 
-                    frOpen[0] = frOpen[0] + door.hinge + (wall_width if door.hinge==door.fromPosition else 0)
-                    frOpen[1] = frOpen[1] + (-wall_width if door.openLeft else wall_width)
-                    toOpen[0] = toOpen[0] + door.hinge + (-wall_width if door.hinge!=door.fromPosition else 0)
-                    toOpen[1] = toOpen[1] + wall_width + (-wall_width if door.openLeft else wall_width)
+                fr[0] = fr[0] + door.fromPosition
+                to[0] = to[0] + door.toPosition
+                to[1] = to[1] + wall_width
 
-                else:
-                    frHinge[1] = frHinge[1] + door.hinge
-                    toHinge[1] = toHinge[1] + door.hinge+wall_width
-                    toHinge[0] = toHinge[0] + wall_width
+                frOpen[0] = frOpen[0] + door.hinge + (wall_width if door.hinge==door.fromPosition else 0)
+                frOpen[1] = frOpen[1] + (-wall_width if door.openLeft else wall_width)
+                toOpen[0] = toOpen[0] + door.hinge + (-wall_width if door.hinge!=door.fromPosition else 0)
+                toOpen[1] = toOpen[1] + wall_width + (-wall_width if door.openLeft else wall_width)
 
-                    fr[1] = fr[1] + door.fromPosition
-                    to[1] = to[1] + door.toPosition
-                    to[0] = to[0] + wall_width
-                img1.rectangle([tuple(fr),tuple(to)], fill="#f00")
-                img1.rectangle([tuple(frHinge),tuple(toHinge)], fill="#000")
-                img1.rectangle([tuple(frOpen),tuple(toOpen)], fill="#f00")
+            else:
+                frHinge[0] = frHinge[0] - wall_width
+                frHinge[1] = frHinge[1] + door.hinge + (wall_width if door.hinge==door.fromPosition else 0)
+                toHinge[1] = toHinge[1] + door.hinge + (-wall_width if door.hinge!=door.fromPosition else 0)
+
+                fr[0] = fr[0] - wall_width
+                fr[1] = fr[1] + door.fromPosition
+                to[1] = to[1] + door.toPosition
+
+                frOpen[0] = frOpen[0] + (-wall_width if door.openLeft else wall_width) - wall_width
+                frOpen[1] = frOpen[1] + door.hinge + (wall_width if door.hinge==door.fromPosition else 0)
+                toOpen[0] = toOpen[0] + (-wall_width if door.openLeft else wall_width)
+                toOpen[1] = toOpen[1] + door.hinge + (-wall_width if door.hinge!=door.fromPosition else 0)
+
+            img1.rectangle([tuple(fr),tuple(to)], fill="#f00")
+            img1.rectangle([tuple(frHinge),tuple(toHinge)], fill="#000")
+            img1.rectangle([tuple(frOpen),tuple(toOpen)], fill="#f00")
 
 
-    # print(json.dumps(junctions))
 
     for idx,junc in enumerate(junctions):
-        # junctions[idx]["outerwall"] = False
         outline = "#f00"
         if junctions[idx]["outerwall"]:
             outline = "#f00"
