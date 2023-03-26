@@ -33,7 +33,7 @@ class Server(BaseHTTPRequestHandler):
                 "success": walls!="no",
                 "walls": walls,
                 "junctions": junctions,
-            }).encode())
+            }, unpicklable=False).encode())
             return
         if self.path.endswith("/dash.html"):
             self.wfile.write(open('dash.html', 'rb'))
