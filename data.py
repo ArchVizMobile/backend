@@ -1,6 +1,6 @@
 import random
 from typing import List
-from APIResponse import APIResponse, Position, Wall
+from APIResponse import APIResponse, Door, Position, Wall, Window
 from config import CONFIG
 from generateCorners import generateCorners
 
@@ -12,14 +12,14 @@ def getData():
     wall_width = CONFIG.getWALL_WIDTH()
     wall_width_half = wall_width/2
 
-    # rooms = [[[100, 100, True, '#000000'], [294, 100, True, '#000000'], [563, 100, True, '#000000']], [[100, 415, True, '#000000'], [100, 415, False, '#000000'], [294, 415, False, '#000000'], [398, 415, True, '#000000'], [563, 415, False, '#000000'], [592, 415, True, '#000000']], [[100, 750, True, '#000000'], [100, 750, False, '#000000'], [398, 750, False, '#000000'], [446, 750, True, '#000000'], [592, 750, False, '#000000'], [738, 750, True, '#000000']], [[100, 982, True, '#000000'], [100, 982, False, '#000000'], [444, 982, True, '#000000'], [446, 982, False, '#000000'], [659, 982, True, '#000000'], [738, 982, False, '#000000']], [[100, 982, True, '#000000'], [100, 982, False, '#000000'], [444, 982, True, '#000000'], [446, 982, False, '#000000'], [659, 982, True, '#000000'], [738, 982, False, '#000000']], [[100, 1070, False, '#000000'], [444, 1070, False, '#000000'], [659, 1070, False, '#000000']]]
+    rooms = [[[100, 100, True, '#000000'], [294, 100, True, '#000000'], [563, 100, True, '#000000']], [[100, 415, True, '#000000'], [100, 415, False, '#000000'], [294, 415, False, '#000000'], [398, 415, True, '#000000'], [563, 415, False, '#000000'], [592, 415, True, '#000000']], [[100, 750, True, '#000000'], [100, 750, False, '#000000'], [398, 750, False, '#000000'], [446, 750, True, '#000000'], [592, 750, False, '#000000'], [738, 750, True, '#000000']], [[100, 982, True, '#000000'], [100, 982, False, '#000000'], [444, 982, True, '#000000'], [446, 982, False, '#000000'], [659, 982, True, '#000000'], [738, 982, False, '#000000']], [[100, 982, True, '#000000'], [100, 982, False, '#000000'], [444, 982, True, '#000000'], [446, 982, False, '#000000'], [659, 982, True, '#000000'], [738, 982, False, '#000000']], [[100, 1070, False, '#000000'], [444, 1070, False, '#000000'], [659, 1070, False, '#000000']]]
     # print(rooms)
 
     # good example
     # rooms = [[[100, 100, True, '#000000'], [455, 100, True, '#000000'], [813, 100, True, '#000000']], [[100, 444, True, '#000000'], [100, 444, False, '#000000'], [432, 444, True, '#000000'], [455, 444, False, '#000000'], [656, 444, True, '#000000'], [813, 444, False, '#000000']], [[100, 758, True, '#000000'], [100, 758, False, '#000000'], [396, 758, True, '#000000'], [432, 758, False, '#000000'], [610, 758, True, '#000000'], [656, 758, False, '#000000']], [[100, 1125, True, '#000000'], [100, 1125, False, '#000000'], [396, 1125, False, '#000000'], [484, 1125, True, '#000000'], [610, 1125, False, '#000000']], [[100, 1190, False, '#000000'], [484, 1190, False, '#000000']]]
 
     # bad example
-    rooms = [[[100, 100, True, '#000000'], [491, 100, True, '#000000'], [880, 100, True, '#000000']], [[100, 385, True, '#000000'], [100, 385, False, '#000000'], [474, 385, True, '#000000'], [491, 385, False, '#000000'], [696, 385, True, '#000000'], [880, 385, False, '#000000']], [[100, 733, True, '#000000'], [100, 733, False, '#000000'], [376, 733, True, '#000000'], [474, 733, False, '#000000'], [696, 733, False, '#000000'], [755, 733, True, '#000000']], [[100, 991, True, '#000000'], [100, 991, False, '#000000'], [331, 991, True, '#000000'], [376, 991, False, '#000000'], [600, 991, True, '#000000'], [755, 991, False, '#000000']], [[100, 1091, False, '#000000'], [331, 1091, False, '#000000'], [600, 1091, False, '#000000']]]
+    # rooms = [[[100, 100, True, '#000000'], [491, 100, True, '#000000'], [880, 100, True, '#000000']], [[100, 385, True, '#000000'], [100, 385, False, '#000000'], [474, 385, True, '#000000'], [491, 385, False, '#000000'], [696, 385, True, '#000000'], [880, 385, False, '#000000']], [[100, 733, True, '#000000'], [100, 733, False, '#000000'], [376, 733, True, '#000000'], [474, 733, False, '#000000'], [696, 733, False, '#000000'], [755, 733, True, '#000000']], [[100, 991, True, '#000000'], [100, 991, False, '#000000'], [331, 991, True, '#000000'], [376, 991, False, '#000000'], [600, 991, True, '#000000'], [755, 991, False, '#000000']], [[100, 1091, False, '#000000'], [331, 1091, False, '#000000'], [600, 1091, False, '#000000']]]
 
     for idx,room in enumerate(rooms):
         for idx1,room1 in enumerate(room):
@@ -155,43 +155,56 @@ def getData():
     
     outerwalls = []
     for idx,wall in enumerate(wallsobj):
-        if wall["isOuterWall"]:
+        if wall.isOuterWall:
             outerwalls.append({"idx":idx,"wall":wall})
 
     # for n in range(int(random.random()*3)):
     for n in range(10):
         idx = random.randrange(0,len(outerwalls))
-        o = wallsobj[outerwalls[idx]["idx"]]
+        o:Wall = wallsobj[outerwalls[idx]["idx"]]
 
         doorWidth = int(random.randrange(80,120))
 
-        checkVertical = not o["isHorizontal"] and len(o["doors"])==0 and o["to"]["y"]-o["from"]["y"] > doorWidth*2
-        checkHorizontal = o["isHorizontal"] and len(o["doors"])==0 and o["to"]["x"]-o["from"]["x"] > doorWidth*2
+        checkVertical = not o.isHorizontal and len(o.doors)==0 and o.toPosition.y-o.fromPosition.y > doorWidth*2
+        checkHorizontal = o.isHorizontal and len(o.doors)==0 and o.toPosition.x-o.fromPosition.x > doorWidth*2
 
-        if checkVertical or checkHorizontal:
-            o["doors"].append({
-                "from": 50,
-                "to": doorWidth + 50,
-                "hinge": 50,
-                "openLeft": True,
-                "style": "default"
-            })
+        if checkVertical:
+            fromPosition = random.randrange(10,o.toPosition.y-o.fromPosition.y - 20 - doorWidth)
+            o.doors.append(Door(
+                fromPosition = fromPosition,
+                toPosition = doorWidth + fromPosition,
+                hinge = 50,
+                openLeft = True,
+                style = "default"
+            ))
+
+        if checkHorizontal:
+            fromPosition = random.randrange(10,o.toPosition.x-o.fromPosition.x - 20 - doorWidth)
+            toPosition = fromPosition + doorWidth
+            hinge = fromPosition if random.random() > 0.5 else toPosition
+            o.doors.append(Door(
+                fromPosition = fromPosition,
+                toPosition = toPosition,
+                hinge = fromPosition,
+                openLeft = True,
+                style = "default"
+            ))
 
     for n in range(10):
         idx = random.randrange(0,len(outerwalls))
-        o = wallsobj[outerwalls[idx]["idx"]]
+        o:Wall = wallsobj[outerwalls[idx]["idx"]]
 
         doorWidth = int(random.randrange(80,120))
 
-        checkVertical = not o["isHorizontal"] and len(o["doors"])==0 and o["to"]["y"]-o["from"]["y"] > doorWidth*2
-        checkHorizontal = o["isHorizontal"] and len(o["doors"])==0 and o["to"]["x"]-o["from"]["x"] > doorWidth*2
+        checkVertical = not o.isHorizontal and len(o.doors)==0 and o.toPosition.y-o.fromPosition.y > doorWidth*2
+        checkHorizontal = o.isHorizontal and len(o.doors)==0 and o.toPosition.x-o.fromPosition.x > doorWidth*2
 
         if checkVertical or checkHorizontal:
-            o["windows"].append({
-                "from": 50,
-                "to": doorWidth + 50,
-                "style": "default"
-            })
+            o.windows.append(Window(
+                fromPosition = 50,
+                toPosition = doorWidth + 50,
+                style = "default"
+            ))
 
     # print(outerwalls)
 
