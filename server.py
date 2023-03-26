@@ -1,6 +1,8 @@
 from http.server import BaseHTTPRequestHandler,HTTPServer
 import json
 
+import jsonpickle
+
 from data import getData
 from config import CONFIG
 
@@ -27,7 +29,7 @@ class Server(BaseHTTPRequestHandler):
                 walls,junctions,_ = getData()
             except:
                 walls,junctions,walls = "no"
-            self.wfile.write(json.dumps({
+            self.wfile.write(jsonpickle.encode({
                 "success": walls!="no",
                 "walls": walls,
                 "junctions": junctions,
