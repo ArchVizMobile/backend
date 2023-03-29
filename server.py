@@ -29,9 +29,9 @@ class Server(BaseHTTPRequestHandler):
         if self.path.endswith("/"):
             self.send_header('Content-type','application/json')
             try:
-                walls,junctions,o = getData()
+                walls,junctions = getData()
                 #wallsobj,junctions,wallsarr = getData()
-                draw(o,junctions,walls)
+                draw(junctions,walls)
             except Exception as e:
                 print(e)
                 walls,junctions = "no","no"
