@@ -1,4 +1,5 @@
 import json
+import random
 from typing import List
 import jsonpickle
 import numpy as np
@@ -7,21 +8,39 @@ import time
 from APIResponse import Wall
 from config import CONFIG
 
-def draw(walls,junctions,wallsobj:List[Wall]):
-    w = CONFIG.getIMAGE_WIDTH()
-    h = CONFIG.getIMAGE_HEIGHT()
+def draw(junctions,wallsobj:List[Wall]):
+    xmin = 99999999999
+    xmax = 0
+    ymin = 99999999999
+    ymax = 0
+
+    for wall in wallsobj:
+        if xmin > wall.fromPosition.x:
+            xmin = wall.fromPosition.x
+        if xmax < wall.toPosition.x:
+            xmax = wall.toPosition.x
+        if ymin > wall.fromPosition.y:
+            ymin = wall.fromPosition.y
+        if ymax < wall.toPosition.y:
+            ymax = wall.toPosition.y
+
+    w = xmax - xmin + 200
+    h = ymax - ymin + 200
     img = np.zeros([h,w,3],dtype=np.uint8)
     img.fill(255) # numpy array!
     im = Image.fromarray(img) #convert numpy array to image
     img1 = ImageDraw.Draw(im)
 
-    wall_width = 1
+    wall_width = 10
     wall_width_half = wall_width/2
 
     for idx,wall in enumerate(wallsobj):
         fill = "#000"
         if wall.isOuterWall:
-            fill = "#999"
+            fill = "#eee"
+        
+        # r = lambda: random.randint(0,255)
+        # fill = f'#%02X%02X%02X' % (r(),r(),r())
         img1.rectangle([(wall.fromPosition.x,wall.fromPosition.y),(wall.toPosition.x,wall.toPosition.y)], fill)
 
         for door in wall.doors:
