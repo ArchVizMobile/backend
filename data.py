@@ -4,7 +4,6 @@ from APIResponse import APIResponse, Door, Position, SimplePosition, Wall, Windo
 from config import CONFIG
 from generateCorners import generateCorners
 
-# a <= x <= b
 def between(a,x,b):
     return a <= x and x <= b
 
@@ -22,54 +21,48 @@ def checkIntersecting(arr:List[SimplePosition],fr:int,to:int):
             return True
     return False
 
-
 def getData():
     response = APIResponse(success=False,junctions=[],walls=[])
 
     rooms = generateCorners()
 
+    # rooms = [[{'x': 100, 'y': 100, 'generated': True}, {'x': 574, 'y': 100, 'generated': True}, {'x': 1044, 'y': 100, 'generated': True}], [{'x': 100, 'y': 325, 'generated': True}, {'x': 100, 'y': 325, 'generated': False}, {'x': 373, 'y': 325, 'generated': True}, {'x': 574, 'y': 325, 'generated': False}, {'x': 612, 'y': 325, 'generated': True}, {'x': 970, 'y': 325, 'generated': True}, {'x': 1044, 'y': 325, 'generated': False}], [{'x': 100, 'y': 795, 'generated': True}, {'x': 100, 'y': 795, 'generated': False}, {'x': 373, 'y': 795, 'generated': False}, {'x': 558, 'y': 795, 'generated': True}, {'x': 612, 'y': 795, 'generated': False}, {'x': 948, 'y': 795, 'generated': True}, {'x': 970, 'y': 795, 'generated': False}, {'x': 1210, 'y': 795, 'generated': True}, {'x': 1496, 'y': 795, 'generated': True}], [{'x': 100, 'y': 995, 'generated': False}, {'x': 558, 'y': 995, 'generated': False}, {'x': 948, 'y': 995, 'generated': False}, {'x': 1210, 'y': 995, 'generated': False}, {'x': 1496, 'y': 995, 'generated': False}]]
+    rooms = [[{'x': 100, 'y': 100, 'generated': True}, {'x': 413, 'y': 100, 'generated': True}, {'x': 650, 'y': 100, 'generated': True}, {'x': 1028, 'y': 100, 'generated': True}], [{'x': 100, 'y': 441, 'generated': True}, {'x': 100, 'y': 441, 'generated': False}, {'x': 413, 'y': 441, 'generated': False}, {'x': 441, 'y': 441, 'generated': True}, {'x': 650, 'y': 441, 'generated': False}, {'x': 905, 'y': 441, 'generated': True}, {'x': 1028, 'y': 441, 'generated': False}, {'x': 1152, 'y': 441, 'generated': True}], [{'x': 100, 'y': 724, 'generated': True}, {'x': 100, 'y': 724, 'generated': False}, {'x': 353, 'y': 724, 'generated': True}, {'x': 441, 'y': 724, 'generated': False}, {'x': 737, 'y': 724, 'generated': True}, {'x': 905, 'y': 724, 'generated': False}, {'x': 1013, 'y': 724, 'generated': True}, {'x': 1152, 'y': 724, 'generated': False}], [{'x': 100, 'y': 1088, 'generated': True}, {'x': 100, 'y': 1088, 'generated': False}, {'x': 353, 'y': 1088, 'generated': False}, {'x': 534, 'y': 1088, 'generated': True}, {'x': 737, 'y': 1088, 'generated': False}, {'x': 810, 'y': 1088, 'generated': True}, {'x': 1013, 'y': 1088, 'generated': False}, {'x': 1302, 'y': 1088, 'generated': True}], [{'x': 100, 'y': 1303, 'generated': True}, {'x': 100, 'y': 1303, 'generated': False}, {'x': 413, 'y': 1303, 'generated': True}, {'x': 534, 'y': 1303, 'generated': False}, {'x': 656, 'y': 1303, 'generated': True}, {'x': 810, 'y': 1303, 'generated': False}, {'x': 1302, 'y': 1303, 'generated': False}], [{'x': 100, 'y': 1503, 'generated': False}, {'x': 413, 'y': 1503, 'generated': False}, {'x': 656, 'y': 1503, 'generated': False}]]
+    print(rooms)
+
     wall_width = CONFIG.getWALL_WIDTH()
     wall_width_half = wall_width/2
 
-    # rooms = [[[100, 100, True, '#000000'], [294, 100, True, '#000000'], [563, 100, True, '#000000']], [[100, 415, True, '#000000'], [100, 415, False, '#000000'], [294, 415, False, '#000000'], [398, 415, True, '#000000'], [563, 415, False, '#000000'], [592, 415, True, '#000000']], [[100, 750, True, '#000000'], [100, 750, False, '#000000'], [398, 750, False, '#000000'], [446, 750, True, '#000000'], [592, 750, False, '#000000'], [738, 750, True, '#000000']], [[100, 982, True, '#000000'], [100, 982, False, '#000000'], [444, 982, True, '#000000'], [446, 982, False, '#000000'], [659, 982, True, '#000000'], [738, 982, False, '#000000']], [[100, 982, True, '#000000'], [100, 982, False, '#000000'], [444, 982, True, '#000000'], [446, 982, False, '#000000'], [659, 982, True, '#000000'], [738, 982, False, '#000000']], [[100, 1070, False, '#000000'], [444, 1070, False, '#000000'], [659, 1070, False, '#000000']]]
-    # print(rooms)
-
-    # good example
-    # rooms = [[[100, 100, True, '#000000'], [455, 100, True, '#000000'], [813, 100, True, '#000000']], [[100, 444, True, '#000000'], [100, 444, False, '#000000'], [432, 444, True, '#000000'], [455, 444, False, '#000000'], [656, 444, True, '#000000'], [813, 444, False, '#000000']], [[100, 758, True, '#000000'], [100, 758, False, '#000000'], [396, 758, True, '#000000'], [432, 758, False, '#000000'], [610, 758, True, '#000000'], [656, 758, False, '#000000']], [[100, 1125, True, '#000000'], [100, 1125, False, '#000000'], [396, 1125, False, '#000000'], [484, 1125, True, '#000000'], [610, 1125, False, '#000000']], [[100, 1190, False, '#000000'], [484, 1190, False, '#000000']]]
-
-    # bad example
-    # rooms = [[[100, 100, True, '#000000'], [491, 100, True, '#000000'], [880, 100, True, '#000000']], [[100, 385, True, '#000000'], [100, 385, False, '#000000'], [474, 385, True, '#000000'], [491, 385, False, '#000000'], [696, 385, True, '#000000'], [880, 385, False, '#000000']], [[100, 733, True, '#000000'], [100, 733, False, '#000000'], [376, 733, True, '#000000'], [474, 733, False, '#000000'], [696, 733, False, '#000000'], [755, 733, True, '#000000']], [[100, 991, True, '#000000'], [100, 991, False, '#000000'], [331, 991, True, '#000000'], [376, 991, False, '#000000'], [600, 991, True, '#000000'], [755, 991, False, '#000000']], [[100, 1091, False, '#000000'], [331, 1091, False, '#000000'], [600, 1091, False, '#000000']]]
-
-    for idx,room in enumerate(rooms):
-        for idx1,room1 in enumerate(room):
-            room1[0] = room1[0] - (room1[0] % 20)
-            room1[1] = room1[1] - (room1[1] % 20)
+    # for idx,room in enumerate(rooms):
+    #     for idx1,room1 in enumerate(room):
+    #         room1["x"] = room1["x"] - (room1["x"] % 20)
+    #         room1["y"] = room1["y"] - (room1["y"] % 20)
 
     for idx,room in enumerate(rooms):
         for idx1,room1 in enumerate(room):
             for idx2,room2 in enumerate(room):
-                if idx1!=idx2 and room1[0]==room2[0] and room1[1]==room2[1]:
+                if idx1!=idx2 and room1["x"]==room2["x"] and room1["y"]==room2["y"]:
                     del room[idx2]
     
 
     joints = []
     for idx,y in enumerate(rooms):
-        for xidx,x in enumerate(y):
+        for x in y:
             joints.append({
-                "left":x[0],
-                "top":x[1],
+                "left": x["x"],
+                "top": x["y"],
                 "outerwall": False,
-                "corner":{
-                    "top":None,
-                    "left":None,
-                    "bottom":None,
-                    "right":None
+                "corner": {
+                    "top": None,
+                    "left": None,
+                    "bottom": None,
+                    "right": None
                 },
-                "targetIsOuterwall":{
-                    "top":False,
-                    "left":False,
-                    "bottom":False,
-                    "right":False
+                "targetIsOuterwall": {
+                    "top": False,
+                    "left": False,
+                    "bottom": False,
+                    "right": False
                 }})
     
     for idx,room in enumerate(joints):
@@ -89,44 +82,57 @@ def getData():
 
 
     def traverse(idx,move):
+        if idx == None:
+            return
         joints[idx]["outerwall"] = True
         current = joints[idx]
         corner = current["corner"]
         if move=="right":
-            if corner["right"]!=None and not joints[corner["right"]]["outerwall"]:
+            if corner["right"]!=None and joints[corner["right"]]["outerwall"] == False:
+                # print("right")
                 traverse(corner["right"],"right")
-            elif corner["bottom"]!=None and not joints[corner["bottom"]]["outerwall"]:
+            elif corner["bottom"]!=None and joints[corner["bottom"]]["outerwall"] == False:
+                # print("bottom")
                 traverse(corner["bottom"],"bottom")
-            elif corner["top"]!=None and not joints[corner["top"]]["outerwall"]:
+            elif corner["top"]!=None and joints[corner["top"]]["outerwall"] == False:
+                # print("top")
                 traverse(corner["top"],"top")
-            elif corner["left"]!=None and not joints[corner["left"]]["outerwall"]:
+            elif corner["left"]!=None and joints[corner["left"]]["outerwall"] == False:
+                # print("left")
                 traverse(corner["left"],"left")
 
         if move=="bottom":
-            if corner["bottom"]!=None and not joints[corner["bottom"]]["outerwall"]:
+            if corner["bottom"]!=None and joints[corner["bottom"]]["outerwall"] == False:
+                # print("bottom")
                 traverse(corner["bottom"],"bottom")
-            elif corner["right"]!=None and not joints[corner["right"]]["outerwall"]:
+            elif corner["right"]!=None and joints[corner["right"]]["outerwall"] == False:
+                # print("right")
                 traverse(corner["right"],"right")
-            elif corner["top"]!=None and not joints[corner["top"]]["outerwall"]:
+            elif corner["top"]!=None and joints[corner["top"]]["outerwall"] == False:
+                # print("top")
                 traverse(corner["top"],"top")
-            elif corner["left"]!=None and not joints[corner["left"]]["outerwall"]:
+            elif corner["left"]!=None and joints[corner["left"]]["outerwall"] == False:
+                # print("left")
                 traverse(corner["left"],"left")
 
         if move=="left":
-            if corner["bottom"]!=None and not joints[corner["bottom"]]["outerwall"]:
+            if corner["bottom"]!=None and joints[corner["bottom"]]["outerwall"] == False:
+                # print("bottom")
                 traverse(corner["bottom"],"bottom")
-            elif corner["left"]!=None and not joints[corner["left"]]["outerwall"]:
+            elif corner["left"]!=None and joints[corner["left"]]["outerwall"] == False:
+                # print("left")
                 traverse(corner["left"],"left")
-            elif corner["right"]!=None and not joints[corner["right"]]["outerwall"]:
+            elif corner["right"]!=None and joints[corner["right"]]["outerwall"] == False:
+                # print("right")
                 traverse(corner["right"],"right")
-            elif corner["top"]!=None and not joints[corner["top"]]["outerwall"]:
+            elif corner["top"]!=None and joints[corner["top"]]["outerwall"] == False:
+                # print("top")
                 traverse(corner["top"],"top")
-            
 
         if move=="top":
             if idx!=0:
+                # print("top")
                 traverse(corner["top"],"top")
-            
 
     traverse(0,"right")
 
@@ -142,36 +148,32 @@ def getData():
 
     # print(json.dumps(joints,indent=2))
 
-    wallsarr = []
-
-    for idx,x in enumerate(joints):
-        if x["corner"]["right"]:
-            wall = [[
-                [x["left"]+wall_width_half,x["top"]-wall_width_half],
-                [joints[x["corner"]["right"]]["left"]-wall_width_half,joints[x["corner"]["right"]]["top"]+wall_width_half],
-            ],True,x["targetIsOuterwall"]["right"] and x["outerwall"]]
-            wallsarr.append(wall)
-            
-        if x["corner"]["bottom"]:
-            wall = [[
-                [x["left"]+wall_width_half,x["top"]-wall_width_half],
-                [joints[x["corner"]["bottom"]]["left"]-wall_width_half,joints[x["corner"]["bottom"]]["top"]+wall_width_half],
-            ],False,x["targetIsOuterwall"]["bottom"] and x["outerwall"]]
-            wallsarr.append(wall)
-    
-
     wallsobj:List[Wall] = []
 
-    for idx,wall in enumerate(wallsarr):
-        wallsobj.append(Wall(
-            fromPosition=Position(int(wall[0][0][0]),int(wall[0][0][1])),
-            toPosition=Position(int(wall[0][1][0]),int(wall[0][1][1])),
-            isHorizontal=wall[1],
-            isOuterWall=wall[2],
-            doors=[],
-            windows=[]
-        ))
+    for idx,x in enumerate(joints):
+        # print(x)
+        if x["corner"]["right"]:
+            wallsobj.append(Wall(
+                fromPosition=Position(int(x["left"]+wall_width_half),int(x["top"]-wall_width_half)),
+                toPosition=Position(int(joints[x["corner"]["right"]]["left"]-wall_width_half),int(joints[x["corner"]["right"]]["top"]+wall_width_half)),
+                isHorizontal=True,
+                isOuterWall=x["targetIsOuterwall"]["right"] and x["outerwall"] and (not x["targetIsOuterwall"]["top"] or not x["targetIsOuterwall"]["bottom"]),
+                doors=[],
+                windows=[]
+            ))
+            
+        if x["corner"]["bottom"]:
+            wallsobj.append(Wall(
+                fromPosition=Position(int(x["left"]+wall_width_half),int(x["top"]-wall_width_half)),
+                toPosition=Position(int(joints[x["corner"]["bottom"]]["left"]-wall_width_half),int(joints[x["corner"]["bottom"]]["top"]+wall_width_half)),
+                isHorizontal=False,
+                isOuterWall=x["targetIsOuterwall"]["bottom"] and x["outerwall"] and (not x["targetIsOuterwall"]["right"] or not x["targetIsOuterwall"]["left"]),
+                doors=[],
+                windows=[]
+            ))
     
+
+
     outerwalls = []
     innerwalls = []
     for idx,wall in enumerate(wallsobj):
@@ -212,7 +214,7 @@ def getData():
                 ))
 
     # outer walls windows
-    for _ in range(100):
+    for _ in range(10):
         idx = random.randrange(0,len(outerwalls))
         o:Wall = wallsobj[outerwalls[idx]["idx"]]
 
@@ -272,4 +274,4 @@ def getData():
 
     response.walls = wallsobj
 
-    return wallsobj,joints,wallsarr
+    return wallsobj,joints
