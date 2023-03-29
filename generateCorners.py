@@ -33,6 +33,10 @@ def generateCorners():
     for _ in range(horizohntahl_roomz_count):
         if rngWall():
             rooms[0].append(createHorizontalWall(rooms[0][len(rooms[0])-1]["x"],rooms[0][0]["y"]))
+        if len(rooms[0])==1:
+            rooms[0].append(createHorizontalWall(rooms[0][len(rooms[0])-1]["x"],rooms[0][0]["y"]))
+        if len(rooms[0])==2:
+            rooms[0].append(createHorizontalWall(rooms[0][len(rooms[0])-1]["x"],rooms[0][0]["y"]))
 
     # All Horizontal Lines and the most left wall
     for _ in range(vertical_roomz_count):
