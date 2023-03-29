@@ -27,7 +27,7 @@ def getData():
     rooms = generateCorners()
 
     # rooms = [[{'x': 100, 'y': 100, 'generated': True}, {'x': 574, 'y': 100, 'generated': True}, {'x': 1044, 'y': 100, 'generated': True}], [{'x': 100, 'y': 325, 'generated': True}, {'x': 100, 'y': 325, 'generated': False}, {'x': 373, 'y': 325, 'generated': True}, {'x': 574, 'y': 325, 'generated': False}, {'x': 612, 'y': 325, 'generated': True}, {'x': 970, 'y': 325, 'generated': True}, {'x': 1044, 'y': 325, 'generated': False}], [{'x': 100, 'y': 795, 'generated': True}, {'x': 100, 'y': 795, 'generated': False}, {'x': 373, 'y': 795, 'generated': False}, {'x': 558, 'y': 795, 'generated': True}, {'x': 612, 'y': 795, 'generated': False}, {'x': 948, 'y': 795, 'generated': True}, {'x': 970, 'y': 795, 'generated': False}, {'x': 1210, 'y': 795, 'generated': True}, {'x': 1496, 'y': 795, 'generated': True}], [{'x': 100, 'y': 995, 'generated': False}, {'x': 558, 'y': 995, 'generated': False}, {'x': 948, 'y': 995, 'generated': False}, {'x': 1210, 'y': 995, 'generated': False}, {'x': 1496, 'y': 995, 'generated': False}]]
-    rooms = [[{'x': 100, 'y': 100, 'generated': True}, {'x': 413, 'y': 100, 'generated': True}, {'x': 650, 'y': 100, 'generated': True}, {'x': 1028, 'y': 100, 'generated': True}], [{'x': 100, 'y': 441, 'generated': True}, {'x': 100, 'y': 441, 'generated': False}, {'x': 413, 'y': 441, 'generated': False}, {'x': 441, 'y': 441, 'generated': True}, {'x': 650, 'y': 441, 'generated': False}, {'x': 905, 'y': 441, 'generated': True}, {'x': 1028, 'y': 441, 'generated': False}, {'x': 1152, 'y': 441, 'generated': True}], [{'x': 100, 'y': 724, 'generated': True}, {'x': 100, 'y': 724, 'generated': False}, {'x': 353, 'y': 724, 'generated': True}, {'x': 441, 'y': 724, 'generated': False}, {'x': 737, 'y': 724, 'generated': True}, {'x': 905, 'y': 724, 'generated': False}, {'x': 1013, 'y': 724, 'generated': True}, {'x': 1152, 'y': 724, 'generated': False}], [{'x': 100, 'y': 1088, 'generated': True}, {'x': 100, 'y': 1088, 'generated': False}, {'x': 353, 'y': 1088, 'generated': False}, {'x': 534, 'y': 1088, 'generated': True}, {'x': 737, 'y': 1088, 'generated': False}, {'x': 810, 'y': 1088, 'generated': True}, {'x': 1013, 'y': 1088, 'generated': False}, {'x': 1302, 'y': 1088, 'generated': True}], [{'x': 100, 'y': 1303, 'generated': True}, {'x': 100, 'y': 1303, 'generated': False}, {'x': 413, 'y': 1303, 'generated': True}, {'x': 534, 'y': 1303, 'generated': False}, {'x': 656, 'y': 1303, 'generated': True}, {'x': 810, 'y': 1303, 'generated': False}, {'x': 1302, 'y': 1303, 'generated': False}], [{'x': 100, 'y': 1503, 'generated': False}, {'x': 413, 'y': 1503, 'generated': False}, {'x': 656, 'y': 1503, 'generated': False}]]
+    # rooms = [[{'x': 100, 'y': 100, 'generated': True}, {'x': 413, 'y': 100, 'generated': True}, {'x': 650, 'y': 100, 'generated': True}, {'x': 1028, 'y': 100, 'generated': True}], [{'x': 100, 'y': 441, 'generated': True}, {'x': 100, 'y': 441, 'generated': False}, {'x': 413, 'y': 441, 'generated': False}, {'x': 441, 'y': 441, 'generated': True}, {'x': 650, 'y': 441, 'generated': False}, {'x': 905, 'y': 441, 'generated': True}, {'x': 1028, 'y': 441, 'generated': False}, {'x': 1152, 'y': 441, 'generated': True}], [{'x': 100, 'y': 724, 'generated': True}, {'x': 100, 'y': 724, 'generated': False}, {'x': 353, 'y': 724, 'generated': True}, {'x': 441, 'y': 724, 'generated': False}, {'x': 737, 'y': 724, 'generated': True}, {'x': 905, 'y': 724, 'generated': False}, {'x': 1013, 'y': 724, 'generated': True}, {'x': 1152, 'y': 724, 'generated': False}], [{'x': 100, 'y': 1088, 'generated': True}, {'x': 100, 'y': 1088, 'generated': False}, {'x': 353, 'y': 1088, 'generated': False}, {'x': 534, 'y': 1088, 'generated': True}, {'x': 737, 'y': 1088, 'generated': False}, {'x': 810, 'y': 1088, 'generated': True}, {'x': 1013, 'y': 1088, 'generated': False}, {'x': 1302, 'y': 1088, 'generated': True}], [{'x': 100, 'y': 1303, 'generated': True}, {'x': 100, 'y': 1303, 'generated': False}, {'x': 413, 'y': 1303, 'generated': True}, {'x': 534, 'y': 1303, 'generated': False}, {'x': 656, 'y': 1303, 'generated': True}, {'x': 810, 'y': 1303, 'generated': False}, {'x': 1302, 'y': 1303, 'generated': False}], [{'x': 100, 'y': 1503, 'generated': False}, {'x': 413, 'y': 1503, 'generated': False}, {'x': 656, 'y': 1503, 'generated': False}]]
     print(rooms)
 
     wall_width = CONFIG.getWALL_WIDTH()
@@ -49,6 +49,7 @@ def getData():
     for idx,y in enumerate(rooms):
         for x in y:
             joints.append({
+                "yIndex": idx,
                 "left": x["x"],
                 "top": x["y"],
                 "outerwall": False,
@@ -75,10 +76,12 @@ def getData():
                     room["corner"]["right"]=idx1
 
                 if room["top"] > room1["top"] and room["left"]==room1["left"] and (room["corner"]["top"]==None or room["top"] > joints[room["corner"]["top"]]["top"]):
-                    room["corner"]["top"]=idx1
+                    if room["yIndex"]==room1["yIndex"]-1 or room["yIndex"]==room1["yIndex"]+1:
+                        room["corner"]["top"]=idx1
 
                 if room["top"] < room1["top"] and room["left"]==room1["left"] and (room["corner"]["bottom"]==None or room["top"] > joints[room["corner"]["bottom"]]["top"]):
-                    room["corner"]["bottom"]=idx1
+                    if room["yIndex"]==room1["yIndex"]-1 or room["yIndex"]==room1["yIndex"]+1:
+                        room["corner"]["bottom"]=idx1
 
 
     def traverse(idx,move):
