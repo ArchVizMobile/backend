@@ -3,5 +3,5 @@ from draw import draw
 from dotenv import load_dotenv
 load_dotenv()
 
-wallsobj,junctions,wallsarr = getData()
-draw(wallsarr,junctions,wallsobj)
+wallsobj,junctions = getData()
+draw(junctions,wallsobj)
