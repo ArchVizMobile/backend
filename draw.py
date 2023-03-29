@@ -15,7 +15,7 @@ def draw(walls,junctions,wallsobj:List[Wall]):
     im = Image.fromarray(img) #convert numpy array to image
     img1 = ImageDraw.Draw(im)
 
-    wall_width = CONFIG.getWALL_WIDTH()
+    wall_width = 1
     wall_width_half = wall_width/2
 
     for idx,wall in enumerate(wallsobj):
@@ -35,7 +35,7 @@ def draw(walls,junctions,wallsobj:List[Wall]):
             toOpen = [wall.fromPosition.x,wall.fromPosition.y]
 
             if wall.isHorizontal:
-                
+
                 frHinge[0] = frHinge[0] + door.hinge + (wall_width if door.hinge==door.fromPosition else 0)
                 toHinge[0] = toHinge[0] + door.hinge + (-wall_width if door.hinge!=door.fromPosition else 0)
                 toHinge[1] = toHinge[1] + wall_width
@@ -71,7 +71,7 @@ def draw(walls,junctions,wallsobj:List[Wall]):
             fr = [wall.fromPosition.x,wall.fromPosition.y]
             to = [wall.fromPosition.x,wall.fromPosition.y]
             if wall.isHorizontal:
-                
+
                 fr[0] = fr[0] + window.fromPosition
                 to[0] = to[0] + window.toPosition
                 to[1] = to[1] + wall_width
@@ -101,10 +101,9 @@ def draw(walls,junctions,wallsobj:List[Wall]):
             pos[0][1] = pos[0][1] - 20
         if junc["corner"]["bottom"]!=None:
             pos[1][1] = pos[1][1] + 20
-    
+
     if CONFIG.getSAVE_STATIC():
         filename = f"images/{time.time()}.jpg"
         im.save(filename)
     if CONFIG.getSAVE_TEMP():
         im.save("whh.jpg")
-

@@ -1,13 +1,15 @@
 from http.server import BaseHTTPRequestHandler,HTTPServer
 import json
 
+
 import jsonpickle
 
 from data import getData
 from config import CONFIG
+from draw import draw
 
 class Server(BaseHTTPRequestHandler):
-    
+
     def do_OPTIONS(self):
         self.send_response(200, "ok")
         self.send_header('Access-Control-Allow-Credentials', 'true')
@@ -22,12 +24,16 @@ class Server(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET')
         self.send_header("Access-Control-Allow-Headers", "X-Requested-With, Content-type")
-        self.send_header('Content-type','text/html')
+        #self.send_header('Content-type','text/html')
         self.end_headers()
         if self.path.endswith("/"):
+            self.send_header('Content-type','application/json')
             try:
-                walls,junctions,_ = getData()
-            except:
+                walls,junctions,o = getData()
+                #wallsobj,junctions,wallsarr = getData()
+                draw(o,junctions,walls)
+            except Exception as e:
+                print(e)
                 walls,junctions = "no","no"
             self.wfile.write(jsonpickle.encode({
                 "success": walls!="no",
@@ -36,7 +42,14 @@ class Server(BaseHTTPRequestHandler):
             }, unpicklable=False).encode())
             return
         if self.path.endswith("/dash.html"):
+            self.send_header('Content-type','text/html')
             self.wfile.write(open('dash.html', 'rb'))
+            return
+        if self.path.endswith("/last.jpg"):
+            self.send_header('Content-type','image/jpeg')
+            with open("whh.jpg", 'rb') as file_handle:
+                return self.wfile.write(file_handle.read())
+            #self.wfile.write(open('./whh.jpg', 'rb'))
             return
         self.wfile.write("no".encode())
 
