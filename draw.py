@@ -35,9 +35,9 @@ def draw(junctions,wallsobj:List[Wall]):
     wall_width_half = wall_width/2
 
     for idx,wall in enumerate(wallsobj):
-        fill = "#000"
+        fill = "#eee"
         if wall.isOuterWall:
-            fill = "#eee"
+            fill = "#000"
         
         # r = lambda: random.randint(0,255)
         # fill = f'#%02X%02X%02X' % (r(),r(),r())
