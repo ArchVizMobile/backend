@@ -29,7 +29,7 @@ class Server(BaseHTTPRequestHandler):
             self.send_header('Content-type','application/json')
             s = 1.5
             try:
-                walls,junctions = getData()
+                walls,junctions,rooms = getData()
                 # scale(walls,1.5)
                 for w in walls:
                     w.depth = int(w.depth * s)
@@ -51,14 +51,15 @@ class Server(BaseHTTPRequestHandler):
                         item.z = int(item.z * s)
                         item.height = int(item.height * s)
                 #wallsobj,junctions,wallsarr = getData()
-                draw(junctions,walls)
+                draw(junctions,walls,rooms)
             except Exception as e:
                 print(e)
-                walls,junctions = "no","no"
+                walls,junctions,rooms = "no","no","no"
             self.wfile.write(jsonpickle.encode({
                 "success": walls!="no",
                 "walls": walls,
                 "junctions": junctions,
+                "rooms": rooms,
                 "scale": s
             }, unpicklable=False).encode())
             return

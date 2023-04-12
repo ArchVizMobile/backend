@@ -44,6 +44,16 @@ class Window(SimplePosition):
     def __str__(self) -> str:
         return jsonpickle.encode(self, unpicklable=False)
 
+class Room:
+    def __init__(self,fromPosition:Position,toPosition:Position,floorStyle:str,ceilingStyle:str) -> None:
+        self.fromPosition = fromPosition
+        self.toPosition = toPosition
+        self.floorStyle = floorStyle
+        self.ceilingStyle = ceilingStyle
+        pass
+    def __str__(self) -> str:
+        return jsonpickle.encode(self, unpicklable=False)
+
 class Wall(SimplePosition):
     def __init__(self,fromPosition:Position,toPosition:Position,isHorizontal:bool,isOuterWall:bool,doors:List[Door],windows:List[Window],depth:int,height:int) -> None:
         self.fromPosition = fromPosition

@@ -1,14 +1,15 @@
 import json
 import random
+import sys
 from typing import List
 import jsonpickle
 import numpy as np
 from PIL import Image, ImageDraw,ImageFont
 import time
-from APIResponse import Wall
+from APIResponse import Room, Wall
 from config import CONFIG
 
-def draw(junctions,wallsobj:List[Wall]):
+def draw(junctions,wallsobj:List[Wall],rooms:List[Room]):
     xmin = 99999999999
     xmax = 0
     ymin = 99999999999
@@ -120,6 +121,17 @@ def draw(junctions,wallsobj:List[Wall]):
             pos[0][1] = pos[0][1] - 20
         if junc["corner"]["bottom"]!=None:
             pos[1][1] = pos[1][1] + 20
+
+    if CONFIG.getSAVE_TEMP():
+        im.save("whh copy 2.jpg")
+
+    for room in rooms:
+        img1.rectangle([room.fromPosition.toTuple(),room.toPosition.toTuple()], fill="#ddd")
+
+    # print(sys.argv)
+
+    # r = int(sys.argv[1])
+    # img1.rectangle([rooms[r].fromPosition.toTuple(),rooms[r].toPosition.toTuple()], fill="#f00")
 
     if CONFIG.getSAVE_STATIC():
         filename = f"images/{time.time()}.jpg"
