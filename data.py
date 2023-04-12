@@ -24,6 +24,7 @@ def checkIntersecting(arr:List[SimplePosition],fr:int,to:int):
     return False
 
 def getData():
+    globalHeight = int(random.randrange(250,300))
     response = APIResponse(success=False,junctions=[],walls=[])
 
     rooms = generateCorners()
@@ -33,8 +34,8 @@ def getData():
     
     # Aktuell Kaputt:
     # rooms = [[{'x': 100, 'y': 100, 'generated': True}, {'x': 333, 'y': 100, 'generated': True}, {'x': 731, 'y': 100, 'generated': True}, {'x': 1126, 'y': 100, 'generated': True}, {'x': 1370, 'y': 100, 'generated': True}, {'x': 1730, 'y': 100, 'generated': True}], [{'x': 100, 'y': 477, 'generated': True}, {'x': 100, 'y': 477, 'generated': False}, {'x': 333, 'y': 477, 'generated': False}, {'x': 339, 'y': 477, 'generated': True}, {'x': 731, 'y': 477, 'generated': False}, {'x': 837, 'y': 477, 'generated': True}, {'x': 1126, 'y': 477, 'generated': False}, {'x': 1370, 'y': 477, 'generated': False}, {'x': 1730, 'y': 477, 'generated': False}], [{'x': 100, 'y': 892, 'generated': True}, {'x': 100, 'y': 892, 'generated': False}, {'x': 339, 'y': 892, 'generated': False}, {'x': 347, 'y': 892, 'generated': True}, {'x': 567, 'y': 892, 'generated': True}, {'x': 837, 'y': 892, 'generated': False}, {'x': 918, 'y': 892, 'generated': True}, {'x': 1370, 'y': 892, 'generated': True}], [{'x': 100, 'y': 1324, 'generated': True}, {'x': 100, 'y': 1324, 'generated': False}, {'x': 347, 'y': 1324, 'generated': False}, {'x': 548, 'y': 1324, 'generated': True}, {'x': 567, 'y': 1324, 'generated': False}, {'x': 918, 'y': 1324, 'generated': False}, {'x': 936, 'y': 1324, 'generated': True}, {'x': 1370, 'y': 1324, 'generated': False}], [{'x': 100, 'y': 1575, 'generated': True}, {'x': 100, 'y': 1575, 'generated': False}, {'x': 488, 'y': 1575, 'generated': True}, {'x': 548, 'y': 1575, 'generated': False}, {'x': 751, 'y': 1575, 'generated': True}, {'x': 936, 'y': 1575, 'generated': False}, {'x': 1191, 'y': 1575, 'generated': True}], [{'x': 100, 'y': 1775, 'generated': False}, {'x': 488, 'y': 1775, 'generated': False}, {'x': 751, 'y': 1775, 'generated': False}, {'x': 1191, 'y': 1775, 'generated': False}]]
-    rooms = [[{'x': 100, 'y': 100, 'generated': True}, {'x': 458, 'y': 100, 'generated': True}, {'x': 686, 'y': 100, 'generated': True}, {'x': 1137, 'y': 100, 'generated': True}, {'x': 1343, 'y': 100, 'generated': True}, {'x': 1572, 'y': 100, 'generated': True}], [{'x': 100, 'y': 412, 'generated': True}, {'x': 100, 'y': 412, 'generated': False}, {'x': 378, 'y': 412, 'generated': True}, {'x': 458, 'y': 412, 'generated': False}, {'x': 686, 'y': 412, 'generated': False}, {'x': 747, 'y': 412, 'generated': True}, {'x': 960, 'y': 412, 'generated': True}, {'x': 1137, 'y': 412, 'generated': False}, {'x': 1343, 'y': 412, 'generated': False}, {'x': 1404, 'y': 412, 'generated': True}, {'x': 1572, 'y': 412, 'generated': False}], [{'x': 100, 'y': 723, 'generated': True}, {'x': 100, 'y': 723, 'generated': False}, {'x': 322, 'y': 723, 'generated': True}, {'x': 378, 'y': 723, 'generated': False}, {'x': 568, 'y': 723, 'generated': True}, {'x': 747, 'y': 723, 'generated': False}, {'x': 886, 'y': 723, 'generated': True}, {'x': 960, 'y': 723, 'generated': False}, {'x': 1404, 'y': 723, 'generated': False}], [{'x': 100, 'y': 1170, 'generated': True}, {'x': 100, 'y': 1170, 'generated': False}, {'x': 306, 'y': 1170, 'generated': True}, {'x': 322, 'y': 1170, 'generated': False}, {'x': 559, 'y': 1170, 'generated': True}, {'x': 568, 'y': 1170, 'generated': False}, {'x': 886, 'y': 1170, 'generated': False}, {'x': 969, 'y': 1170, 'generated': True}, {'x': 1299, 'y': 1170, 'generated': True}], [{'x': 100, 'y': 1370, 'generated': False}, {'x': 306, 'y': 1370, 'generated': False}, {'x': 559, 'y': 1370, 'generated': False}, {'x': 969, 'y': 1370, 'generated': False}, {'x': 1299, 'y': 1370, 'generated': False}]]  
-    print(rooms)
+    # rooms = [[{'x': 100, 'y': 100, 'generated': True}, {'x': 458, 'y': 100, 'generated': True}, {'x': 686, 'y': 100, 'generated': True}, {'x': 1137, 'y': 100, 'generated': True}, {'x': 1343, 'y': 100, 'generated': True}, {'x': 1572, 'y': 100, 'generated': True}], [{'x': 100, 'y': 412, 'generated': True}, {'x': 100, 'y': 412, 'generated': False}, {'x': 378, 'y': 412, 'generated': True}, {'x': 458, 'y': 412, 'generated': False}, {'x': 686, 'y': 412, 'generated': False}, {'x': 747, 'y': 412, 'generated': True}, {'x': 960, 'y': 412, 'generated': True}, {'x': 1137, 'y': 412, 'generated': False}, {'x': 1343, 'y': 412, 'generated': False}, {'x': 1404, 'y': 412, 'generated': True}, {'x': 1572, 'y': 412, 'generated': False}], [{'x': 100, 'y': 723, 'generated': True}, {'x': 100, 'y': 723, 'generated': False}, {'x': 322, 'y': 723, 'generated': True}, {'x': 378, 'y': 723, 'generated': False}, {'x': 568, 'y': 723, 'generated': True}, {'x': 747, 'y': 723, 'generated': False}, {'x': 886, 'y': 723, 'generated': True}, {'x': 960, 'y': 723, 'generated': False}, {'x': 1404, 'y': 723, 'generated': False}], [{'x': 100, 'y': 1170, 'generated': True}, {'x': 100, 'y': 1170, 'generated': False}, {'x': 306, 'y': 1170, 'generated': True}, {'x': 322, 'y': 1170, 'generated': False}, {'x': 559, 'y': 1170, 'generated': True}, {'x': 568, 'y': 1170, 'generated': False}, {'x': 886, 'y': 1170, 'generated': False}, {'x': 969, 'y': 1170, 'generated': True}, {'x': 1299, 'y': 1170, 'generated': True}], [{'x': 100, 'y': 1370, 'generated': False}, {'x': 306, 'y': 1370, 'generated': False}, {'x': 559, 'y': 1370, 'generated': False}, {'x': 969, 'y': 1370, 'generated': False}, {'x': 1299, 'y': 1370, 'generated': False}]]  
+    # print(rooms)
 
     wall_width = CONFIG.getWALL_WIDTH()
     wall_width_half = wall_width/2
@@ -161,6 +162,8 @@ def getData():
     wallsobj:List[Wall] = []
 
     for idx,x in enumerate(joints):
+        depth = int(random.randrange(20,21))
+        height = globalHeight #int(random.randrange(250,250))
         # print(x)
         if x["corner"]["right"]:
             wallsobj.append(Wall(
@@ -169,7 +172,9 @@ def getData():
                 isHorizontal=True,
                 isOuterWall=x["targetIsOuterwall"]["right"] and x["outerwall"] and (not x["targetIsOuterwall"]["top"] or not x["targetIsOuterwall"]["bottom"]),
                 doors=[],
-                windows=[]
+                windows=[],
+                depth=depth,
+                height=height,
             ))
             
         if x["corner"]["bottom"]:
@@ -179,7 +184,9 @@ def getData():
                 isHorizontal=False,
                 isOuterWall=x["targetIsOuterwall"]["bottom"] and x["outerwall"] and (not x["targetIsOuterwall"]["right"] or not x["targetIsOuterwall"]["left"]),
                 doors=[],
-                windows=[]
+                windows=[],
+                depth=depth,
+                height=height,
             ))
     
 
@@ -220,7 +227,9 @@ def getData():
                     toPosition = toPosition,
                     hinge = hinge,
                     openLeft = random.random() > 0.5,
-                    style = "default"
+                    style = "default",
+                    height = int(random.randrange(180,220)),
+                    z = int(random.randrange(0,5)),
                 ))
 
     # outer walls windows
@@ -245,10 +254,13 @@ def getData():
                             checkIntersecting(o.windows,fromPosition,toPosition)
 
             if not intersecting:
+                height = int(random.randrange(80,150))
                 o.windows.append(Window(
                     fromPosition = fromPosition,
                     toPosition = toPosition,
-                    style = "default"
+                    style = "default",
+                    height = height,
+                    z = int(random.randrange(80,o.height - height  - 20)),
                 ))
 
     # inner walls
@@ -278,7 +290,9 @@ def getData():
                     toPosition = toPosition,
                     hinge = hinge,
                     openLeft = random.random() > 0.5,
-                    style = "default"
+                    style = "default",
+                    height = int(random.randrange(180,220)),
+                    z = int(random.randrange(0,5)),
                 ))
 
 
