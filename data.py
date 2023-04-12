@@ -199,7 +199,8 @@ def getData():
             innerwalls.append({"idx":idx,"wall":wall})
 
     # outer walls doors
-    for _ in range(10):
+    number_of_doors = int(random.randrange(2,3))
+    for _ in range(number_of_doors):
         idx = random.randrange(0,len(outerwalls))
         o:Wall = wallsobj[outerwalls[idx]["idx"]]
 
@@ -232,14 +233,14 @@ def getData():
                 ))
 
     # outer walls windows
-    for _ in range(10):
+    for _ in range(100):
         idx = random.randrange(0,len(outerwalls))
         o:Wall = wallsobj[outerwalls[idx]["idx"]]
 
         doorWidth = int(random.randrange(80,120))
 
-        checkVertical = not o.isHorizontal and len(o.doors)==0 and len(o.windows)==0 and o.toPosition.y-o.fromPosition.y > doorWidth*2
-        checkHorizontal = o.isHorizontal and len(o.doors)==0 and len(o.windows)==0 and o.toPosition.x-o.fromPosition.x > doorWidth*2
+        checkVertical = not o.isHorizontal and o.toPosition.y-o.fromPosition.y > doorWidth*2
+        checkHorizontal = o.isHorizontal and o.toPosition.x-o.fromPosition.x > doorWidth*2
 
         if checkVertical:
             fromPosition = random.randrange(10,o.toPosition.y-o.fromPosition.y - 20 - doorWidth)
