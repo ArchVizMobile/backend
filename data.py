@@ -1,7 +1,6 @@
 import random
 from typing import List
 
-import jsonpickle
 from APIResponse import APIResponse, Door, Position, SimplePosition, Wall, Window
 from config import CONFIG
 from generateCorners import generateCorners

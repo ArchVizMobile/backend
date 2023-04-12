@@ -1,9 +1,7 @@
 from http.server import BaseHTTPRequestHandler,HTTPServer
-import inspect
-
-
 import jsonpickle
 from APIResponse import Wall
+import typing
 
 from data import getData
 from config import CONFIG
@@ -50,9 +48,29 @@ class Server(BaseHTTPRequestHandler):
         self.end_headers()
         if self.path.endswith("/"):
             self.send_header('Content-type','application/json')
+            s = 1.5
             try:
                 walls,junctions = getData()
-                scale(walls,1.5)
+                # scale(walls,1.5)
+                for w in walls:
+                    w.depth = int(w.depth * s)
+                    w.height = int(w.height * s)
+                    w.fromPosition.x = int(w.fromPosition.x * s)
+                    w.fromPosition.y = int(w.fromPosition.y * s)
+                    w.toPosition.x = int(w.toPosition.x * s)
+                    w.toPosition.y = int(w.toPosition.y * s)
+                    for item in w.doors:
+                        item.fromPosition = int(item.fromPosition * s)
+                        item.toPosition = int(item.toPosition * s)
+                        item.z = int(item.z * s)
+                        item.height = int(item.height * s)
+                        item.hinge = int(item.hinge * s)
+
+                    for item in w.windows:
+                        item.fromPosition = int(item.fromPosition * s)
+                        item.toPosition = int(item.toPosition * s)
+                        item.z = int(item.z * s)
+                        item.height = int(item.height * s)
                 #wallsobj,junctions,wallsarr = getData()
                 draw(junctions,walls)
             except Exception as e:
@@ -62,6 +80,7 @@ class Server(BaseHTTPRequestHandler):
                 "success": walls!="no",
                 "walls": walls,
                 "junctions": junctions,
+                "scale": s
             }, unpicklable=False).encode())
             return
         if self.path.endswith("/dash.html"):
