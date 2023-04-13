@@ -260,7 +260,9 @@ def getData():
             fromPosition = random.randrange(10,o.toPosition.x-o.fromPosition.x - 20 - doorWidth)
 
         if checkVertical or checkHorizontal:
+            fromPosition = fromPosition - (fromPosition % 20)
             toPosition = fromPosition + doorWidth
+            toPosition = toPosition - (fromPosition % 20)
             intersecting = checkIntersecting(o.doors,fromPosition,toPosition) or \
                             checkIntersecting(o.windows,fromPosition,toPosition)
 
