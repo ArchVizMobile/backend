@@ -238,7 +238,7 @@ def getData():
                     openLeft = random.random() > 0.5,
                     style = "default",
                     height = int(random.randrange(180,220)),
-                    z = int(random.randrange(0,5)),
+                    z = 0,
                 ))
 
     # outer walls windows
