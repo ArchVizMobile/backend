@@ -35,6 +35,12 @@ def draw(junctions,wallsobj:List[Wall],rooms:List[Room]):
     wall_width = 10
     wall_width_half = wall_width/2
 
+    for room in rooms:
+        r = lambda: random.randint(0,255)
+        fill = f'#%02X%02X%02X' % (r(),r(),r())
+        fill = "#ffffff"
+        img1.rectangle([room.fromPosition.toTuple(),room.toPosition.toTuple()], fill=fill)
+
     for idx,wall in enumerate(wallsobj):
         fill = "#eee"
         if wall.isOuterWall:
@@ -122,11 +128,8 @@ def draw(junctions,wallsobj:List[Wall],rooms:List[Room]):
         if junc["corner"]["bottom"]!=None:
             pos[1][1] = pos[1][1] + 20
 
-    if CONFIG.getSAVE_TEMP():
-        im.save("whh copy 2.jpg")
-
-    for room in rooms:
-        img1.rectangle([room.fromPosition.toTuple(),room.toPosition.toTuple()], fill="#ddd")
+    # if CONFIG.getSAVE_TEMP():
+    #     im.save("whh copy 2.jpg")
 
     # print(sys.argv)
 
