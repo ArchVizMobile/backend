@@ -242,6 +242,8 @@ def getData():
                 ))
 
     # outer walls windows
+    windowHeight = int(random.randrange(80,150))
+    windowZ = int(random.randrange(80,wallsobj[0].height - windowHeight  - 20))
     for _ in range(100):
         idx = random.randrange(0,len(outerwalls))
         o:Wall = wallsobj[outerwalls[idx]["idx"]]
@@ -263,13 +265,12 @@ def getData():
                             checkIntersecting(o.windows,fromPosition,toPosition)
 
             if not intersecting:
-                height = int(random.randrange(80,150))
                 o.windows.append(Window(
                     fromPosition = fromPosition,
                     toPosition = toPosition,
                     style = "default",
-                    height = height,
-                    z = int(random.randrange(80,o.height - height  - 20)),
+                    height = windowHeight,
+                    z = windowZ,
                 ))
 
     # inner walls
