@@ -107,7 +107,10 @@ def draw(junctions,wallsobj:List[Wall],rooms:List[Room]):
                 fr[1] = fr[1] + window.fromPosition
                 to[1] = to[1] + window.toPosition
 
-            img1.rectangle([tuple(fr),tuple(to)], fill="#00f")
+            r = lambda: random.randint(0,255)
+            fill = f'#%02X%02X%02X' % (r(),r(),r())
+            fill = "#00f"
+            img1.rectangle([tuple(fr),tuple(to)], fill=fill)
 
 
 

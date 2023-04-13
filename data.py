@@ -15,13 +15,15 @@ def betweenPosition(pos,item):
 
 def checkIntersecting(arr:List[SimplePosition],fr:int,to:int):
     for item in arr:
-        currentInItem = betweenPosition(fr,item) or \
-                        betweenPosition(to,item)
+        currentInItem = between(fr,item.fromPosition,to) or \
+                        between(fr,item.toPosition,to)
         
         itemInCurrent = between(item.fromPosition,fr,item.toPosition) or \
                         between(item.fromPosition,to,item.toPosition)
+
         if currentInItem or itemInCurrent:
             return True
+
     return False
 
 def getData():
