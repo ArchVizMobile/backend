@@ -211,7 +211,7 @@ def getData():
         idx = random.randrange(0,len(outerwalls))
         o:Wall = wallsobj[outerwalls[idx]["idx"]]
 
-        doorWidth = int(random.randrange(80,120))
+        doorWidth = int(random.randrange(120,140))
 
         checkVertical = not o.isHorizontal and len(o.doors)==0 and len(o.windows)==0 and o.toPosition.y-o.fromPosition.y > doorWidth*2
         checkHorizontal = o.isHorizontal and len(o.doors)==0 and len(o.windows)==0 and o.toPosition.x-o.fromPosition.x > doorWidth*2
