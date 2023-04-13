@@ -243,7 +243,7 @@ def getData():
 
     # outer walls windows
     windowHeight = int(random.randrange(80,150))
-    windowZ = int(random.randrange(80,wallsobj[0].height - windowHeight  - 20))
+    windowZ = int(random.randrange(80,wallsobj[0].height - windowHeight  - 80))
     for _ in range(100):
         idx = random.randrange(0,len(outerwalls))
         o:Wall = wallsobj[outerwalls[idx]["idx"]]
