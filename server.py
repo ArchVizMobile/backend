@@ -31,6 +31,7 @@ class Server(BaseHTTPRequestHandler):
             try:
                 walls,junctions,rooms = getData()
                 # scale(walls,1.5)
+                
                 for w in walls:
                     w.depth = int(w.depth * s)
                     w.height = int(w.height * s)
@@ -50,6 +51,13 @@ class Server(BaseHTTPRequestHandler):
                         item.toPosition = int(item.toPosition * s)
                         item.z = int(item.z * s)
                         item.height = int(item.height * s)
+
+                for r in rooms:
+                    r.fromPosition.x = int(r.fromPosition.x * s)
+                    r.fromPosition.y = int(r.fromPosition.y * s)
+                    r.toPosition.x = int(r.toPosition.x * s)
+                    r.toPosition.y = int(r.toPosition.y * s)
+
                 #wallsobj,junctions,wallsarr = getData()
                 draw(junctions,walls,rooms)
             except Exception as e:
