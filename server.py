@@ -39,18 +39,12 @@ class Server(BaseHTTPRequestHandler):
                     w.fromPosition.y = int(w.fromPosition.y * s)
                     w.toPosition.x = int(w.toPosition.x * s)
                     w.toPosition.y = int(w.toPosition.y * s)
-                    for item in w.doors:
+                    for item in w.features:
                         item.fromPosition = int(item.fromPosition * s)
                         item.toPosition = int(item.toPosition * s)
                         item.z = int(item.z * s)
                         item.height = int(item.height * s)
                         item.hinge = int(item.hinge * s)
-
-                    for item in w.windows:
-                        item.fromPosition = int(item.fromPosition * s)
-                        item.toPosition = int(item.toPosition * s)
-                        item.z = int(item.z * s)
-                        item.height = int(item.height * s)
 
                 for r in rooms:
                     r.fromPosition.x = int(r.fromPosition.x * s)

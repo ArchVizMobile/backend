@@ -3,7 +3,7 @@ from typing import List
 
 import jsonpickle
 
-from APIResponse import APIResponse, Door, Position, Room, SimplePosition, Wall, Window
+from APIResponse import APIResponse, Door, Feature, FeatureType, Position, Room, SimplePosition, Wall, Window
 from config import CONFIG
 from generateCorners import generateCorners
 
@@ -179,8 +179,7 @@ def getData():
                 toPosition=Position(int(joints[x["corner"]["right"]]["left"]-wall_width_half),int(joints[x["corner"]["right"]]["top"]+wall_width_half)),
                 isHorizontal=True,
                 isOuterWall=x["targetIsOuterwall"]["right"] and x["outerwall"] and (not x["targetIsOuterwall"]["top"] or not x["targetIsOuterwall"]["bottom"]),
-                doors=[],
-                windows=[],
+                features=[],
                 depth=depth,
                 height=height,
             ))
@@ -191,8 +190,7 @@ def getData():
                 toPosition=Position(int(joints[x["corner"]["bottom"]]["left"]-wall_width_half),int(joints[x["corner"]["bottom"]]["top"]+wall_width_half)),
                 isHorizontal=False,
                 isOuterWall=x["targetIsOuterwall"]["bottom"] and x["outerwall"] and (not x["targetIsOuterwall"]["right"] or not x["targetIsOuterwall"]["left"]),
-                doors=[],
-                windows=[],
+                features=[],
                 depth=depth,
                 height=height,
             ))
@@ -215,8 +213,8 @@ def getData():
 
         doorWidth = int(random.randrange(120,140))
 
-        checkVertical = not o.isHorizontal and len(o.doors)==0 and len(o.windows)==0 and o.toPosition.y-o.fromPosition.y > doorWidth*2
-        checkHorizontal = o.isHorizontal and len(o.doors)==0 and len(o.windows)==0 and o.toPosition.x-o.fromPosition.x > doorWidth*2
+        checkVertical = not o.isHorizontal and len(o.features)==0 and o.toPosition.y-o.fromPosition.y > doorWidth*2
+        checkHorizontal = o.isHorizontal and len(o.features)==0 and o.toPosition.x-o.fromPosition.x > doorWidth*2
 
         if checkVertical:
             fromPosition = random.randrange(10,o.toPosition.y-o.fromPosition.y - 20 - doorWidth)
@@ -227,11 +225,10 @@ def getData():
         if checkVertical or checkHorizontal:
             toPosition = fromPosition + doorWidth
             hinge = fromPosition if random.random() > 0.5 else toPosition
-            intersecting = checkIntersecting(o.doors,fromPosition,toPosition) or \
-                            checkIntersecting(o.windows,fromPosition,toPosition)
+            intersecting = checkIntersecting(o.features,fromPosition,toPosition)
 
             if not intersecting:
-                o.doors.append(Door(
+                o.features.append(Feature(
                     fromPosition = fromPosition,
                     toPosition = toPosition,
                     hinge = hinge,
@@ -239,6 +236,7 @@ def getData():
                     style = "default",
                     height = int(random.randrange(180,220)),
                     z = 0,
+                    type = FeatureType.DOOR
                 ))
 
     # outer walls windows
@@ -266,16 +264,18 @@ def getData():
             fromPosition = fromPosition - (fromPosition % 20)
             toPosition = fromPosition + doorWidth
             toPosition = toPosition - (fromPosition % 20)
-            intersecting = checkIntersecting(o.doors,fromPosition,toPosition) or \
-                            checkIntersecting(o.windows,fromPosition,toPosition)
+            intersecting = checkIntersecting(o.features,fromPosition,toPosition)
 
             if not intersecting:
-                o.windows.append(Window(
+                o.features.append(Feature(
                     fromPosition = fromPosition,
                     toPosition = toPosition,
                     style = "default",
                     height = windowHeight,
                     z = windowZ,
+                    type = FeatureType.WINDOW,
+                    hinge=-1,
+                    openLeft=False
                 ))
 
     # inner walls
@@ -296,11 +296,10 @@ def getData():
         if checkVertical or checkHorizontal:
             toPosition = fromPosition + doorWidth
             hinge = fromPosition if random.random() > 0.5 else toPosition
-            intersecting = checkIntersecting(o.doors,fromPosition,toPosition) or \
-                            checkIntersecting(o.windows,fromPosition,toPosition)
+            intersecting = checkIntersecting(o.features,fromPosition,toPosition)
 
             if not intersecting:
-                o.doors.append(Door(
+                o.features.append(Feature(
                     fromPosition = fromPosition,
                     toPosition = toPosition,
                     hinge = hinge,
@@ -308,6 +307,7 @@ def getData():
                     style = "default",
                     height = int(random.randrange(180,220)),
                     z = int(random.randrange(0,5)),
+                    type = FeatureType.DOOR
                 ))
 
 
