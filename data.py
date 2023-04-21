@@ -311,6 +311,14 @@ def getData():
                 ))
 
 
+    for wall in innerwalls:
+        o:Wall = wallsobj[wall["idx"]]
+        o.features = sorted(o.features,key=lambda x: x.fromPosition,reverse=False)
+
+    for wall in outerwalls:
+        o:Wall = wallsobj[wall["idx"]]
+        o.features = sorted(o.features,key=lambda x: x.fromPosition,reverse=False)
+
     response.walls = wallsobj
 
     n = 0
