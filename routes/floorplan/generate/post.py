@@ -4,7 +4,7 @@ import jsonpickle
 from data import getData
 from draw import draw
 
-def GET(self,dbCollection,search):
+def POST(self,dbCollection,search):
     s = 1.5
     try:
         walls,junctions,rooms = getData()
