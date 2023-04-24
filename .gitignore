@@ -5,3 +5,4 @@
 __pycache__
 .env
 temp/
+routes/**/__init__.py
