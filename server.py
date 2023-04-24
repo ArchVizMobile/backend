@@ -32,17 +32,37 @@ def get_random_string(length):
 
 class Server(BaseHTTPRequestHandler):
 
-    def do_OPTIONS(self):
+    def do_POST(self):
         self.send_response(200, "ok")
         self.send_header('Access-Control-Allow-Credentials', 'true')
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET')
         self.send_header("Access-Control-Allow-Headers", "X-Requested-With, Content-type")
 
-        path = self.path
+        # params = self.path.split("?")[1]
+        url = urlparse(self.path)
+        path = url.path
+        search = {}
+        if url.query !="":
+            for item in url.query.split("&"):
+                key,value = item.split("=")
+                search[key]=value
+        try:
+            self.data_string = self.rfile.read(int(self.headers['Content-Length']))
+            self.json = jsonpickle.decode(self.data_string)
+        except:
+            self.send_header('Content-type','application/json')
+            self.end_headers()
+            json = jsonpickle.encode({"success":False}, unpicklable=False)
+
+            self.wfile.write(json.encode())
+            return
 
         if path in API["POST"]:
-            response = API["POST"][path](path)
+            self.send_header('Content-type','application/json')
+            self.end_headers()
+            # self.
+            response = API["POST"][path](self,search=search,dbCollection=mycollection)
             json = jsonpickle.encode(response, unpicklable=False)
 
             self.wfile.write(json.encode())
@@ -56,7 +76,6 @@ class Server(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Methods', 'GET')
         self.send_header("Access-Control-Allow-Headers", "X-Requested-With, Content-type")
         #self.send_header('Content-type','text/html')
-        self.end_headers()
 
         # params = self.path.split("?")[1]
         url = urlparse(self.path)
@@ -70,6 +89,7 @@ class Server(BaseHTTPRequestHandler):
 
         if path=="/image" and "id" in search:
             self.send_header('Content-type','image/png')
+            self.end_headers()
 
 
             search = {"_id":ObjectId(search["id"])}
@@ -90,6 +110,7 @@ class Server(BaseHTTPRequestHandler):
 
         if path in API["GET"]:
             self.send_header('Content-type','application/json')
+            self.end_headers()
             # self.
             response = API["GET"][path](self,search=search,dbCollection=mycollection)
             json = jsonpickle.encode(response, unpicklable=False)
@@ -99,6 +120,7 @@ class Server(BaseHTTPRequestHandler):
 
         if self.path.startswith("/get"):
             self.send_header('Content-type','application/json')
+            self.end_headers()
             search = {"_id":ObjectId(self.path.split("/")[2])}
             cnt = mycollection.count_documents(search)
             ret = {
@@ -121,6 +143,7 @@ class Server(BaseHTTPRequestHandler):
         
         if self.path.endswith("/"):
             self.send_header('Content-type','application/json')
+            self.end_headers()
             ret = API["GET"][""](self,search={},dbCollection=mycollection)
             json = jsonpickle.encode(ret, unpicklable=False)
 
@@ -128,10 +151,12 @@ class Server(BaseHTTPRequestHandler):
             return
         if self.path.endswith("/dash.html"):
             self.send_header('Content-type','text/html')
+            self.end_headers()
             self.wfile.write(open('dash.html', 'rb'))
             return
         if self.path.endswith("/last.jpg"):
             self.send_header('Content-type','image/jpeg')
+            self.end_headers()
             with open("whh.jpg", 'rb') as file_handle:
                 file = file_handle.read()
                 return self.wfile.write(file)
