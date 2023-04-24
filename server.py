@@ -1,5 +1,6 @@
 from datetime import date
 from http.server import BaseHTTPRequestHandler,HTTPServer
+import io
 import os
 import re
 from bson import ObjectId
@@ -9,7 +10,7 @@ import typing
 
 from data import getData
 from config import CONFIG
-from draw import draw
+from draw import draw, drawAndReturnFromDatabase
 
 import pymongo
 import random
@@ -23,6 +24,7 @@ API = loadDynamicAPI(debug=True,fileDebug=False)
 myclient = pymongo.MongoClient(f"mongodb://{CONFIG.getDB_HOST()}:{CONFIG.getDB_PORT()}/")
 mydb = myclient[CONFIG.getDB_DATABASE()]
 mycollection = mydb["floorplans"]
+# print(f"mongodb://{CONFIG.getDB_HOST()}:{CONFIG.getDB_PORT()}/ -> CONFIG.getDB_DATABASE() -> floorplans")
 
 def get_random_string(length):
     result_str = ''.join(random.choice(string.ascii_letters) for i in range(length))
@@ -56,15 +58,27 @@ class Server(BaseHTTPRequestHandler):
         #self.send_header('Content-type','text/html')
         self.end_headers()
 
-        path = self.path.split("?")[0]
         # params = self.path.split("?")[1]
         url = urlparse(self.path)
+        path = url.path
         search = {}
         if url.query !="":
             for item in url.query.split("&"):
                 key,value = item.split("=")
                 search[key]=value
         # print(search)
+
+        if path=="/image" and "id" in search:
+            self.send_header('Content-type','image/jpeg')
+
+            data = mycollection.find_one({"_id":ObjectId(search["id"])})
+
+            im = drawAndReturnFromDatabase(data["junctions"],data["walls"],data["rooms"])
+            img_byte_arr = io.BytesIO()
+            im.save(img_byte_arr, format='PNG')
+            img_byte_arr = img_byte_arr.getvalue()
+            self.wfile.write(img_byte_arr)
+            return
 
         if path in API["GET"]:
             self.send_header('Content-type','application/json')
@@ -96,65 +110,12 @@ class Server(BaseHTTPRequestHandler):
 
             self.wfile.write(json.encode())
             return
-        # if self.path.endswith("/list"):
-        #     self.send_header('Content-type','application/json')
-        #     lst = []
-        #     for item in mycollection.find():
-        #         lst.append({
-        #             "id": str(item.get('_id')),
-        #             "name": item.get("name"),
-        #             "image": "/image/"+str(item.get('_id'))
-        #         })
-        #         # lst.append((item.get('_id')))
-        #     json = jsonpickle.encode({"success":True,"list":lst}, unpicklable=False)
-        #     self.wfile.write(json.encode())
-        #     return
+        
         if self.path.endswith("/"):
             self.send_header('Content-type','application/json')
-            s = 1.5
-            try:
-                walls,junctions,rooms = getData()
-                # scale(walls,1.5)
-                
-                for w in walls:
-                    w.depth = int(w.depth * s)
-                    w.height = int(w.height * s)
-                    w.fromPosition.x = int(w.fromPosition.x * s)
-                    w.fromPosition.y = int(w.fromPosition.y * s)
-                    w.toPosition.x = int(w.toPosition.x * s)
-                    w.toPosition.y = int(w.toPosition.y * s)
-                    for item in w.features:
-                        item.fromPosition = int(item.fromPosition * s)
-                        item.toPosition = int(item.toPosition * s)
-                        item.z = int(item.z * s)
-                        item.height = int(item.height * s)
-                        item.hinge = int(item.hinge * s)
+            ret = API["GET"][""](self,search={},dbCollection=mycollection)
+            json = jsonpickle.encode(ret, unpicklable=False)
 
-                for r in rooms:
-                    r.fromPosition.x = int(r.fromPosition.x * s)
-                    r.fromPosition.y = int(r.fromPosition.y * s)
-                    r.toPosition.x = int(r.toPosition.x * s)
-                    r.toPosition.y = int(r.toPosition.y * s)
-
-                #wallsobj,junctions,wallsarr = getData()
-                draw(junctions,walls,rooms)
-            except Exception as e:
-                print(e)
-                walls,junctions,rooms = "no","no","no"
-            now = datetime.now()
-            dt_string = now.strftime("%d.%m.%Y %H:%M:%S")
-
-            data = {
-                "success": walls!="no",
-                "name": f"Generated Floorplan from {dt_string}",
-                "walls": walls,
-                "junctions": junctions,
-                "rooms": rooms,
-                "scale": s,
-            }
-            json = jsonpickle.encode(data, unpicklable=False)
-            if data["success"]:
-                x = mycollection.insert_one(jsonpickle.decode(json))
             self.wfile.write(json.encode())
             return
         if self.path.endswith("/dash.html"):
@@ -164,14 +125,15 @@ class Server(BaseHTTPRequestHandler):
         if self.path.endswith("/last.jpg"):
             self.send_header('Content-type','image/jpeg')
             with open("whh.jpg", 'rb') as file_handle:
-                return self.wfile.write(file_handle.read())
+                file = file_handle.read()
+                return self.wfile.write(file)
             #self.wfile.write(open('./whh.jpg', 'rb'))
             return
         self.wfile.write("no".encode())
 
 
 def run(server_class=HTTPServer, handler_class=Server, port=CONFIG.getSERVER_PORT()):
-    server_address = ('', port)
+    server_address = (CONFIG.getWEB_HOST(), CONFIG.getWEB_PORT())
     httpd = server_class(server_address, handler_class)
 
     httpd.serve_forever()
