@@ -25,6 +25,12 @@ class Config:
         self._DB_PORT = int(os.environ.get("DB_PORT")) # =27017
         self._DB_DATABASE = os.environ.get("DB_DATABASE") # =archviz
     
+
+        self._WEB_HOST = os.environ.get("WEB_HOST")
+        self._WEB_PORT = int(os.environ.get("WEB_PORT"))
+        self._WEB_PROTOCOL = os.environ.get("WEB_PROTOCOL")
+
+
     def __str__(self) -> str:
         return f"IMAGE_WIDTH={self._IMAGE_WIDTH[0]} - IMAGE_HEIGHT={self._IMAGE_HEIGHT[0]} - SERVER_PORT={self._SERVER_PORT[0]} - SAVE_TEMP={self._SAVE_TEMP[0]} - SAVE_STATIC={self._SAVE_STATIC[0]} - VERTICAL_ROOMZ_COUNT={self._VERTICAL_ROOMZ_COUNT[0]} - HORIZOHNTAHL_ROOMZ_COUNT={self._HORIZOHNTAHL_ROOMZ_COUNT[0]} DB_HOST={self.DB_HOST} - DB_PORT={self.DB_PORT} - DB_DATABASE={self.DB_DATABASE}"
  
@@ -61,5 +67,14 @@ class Config:
     def getDB_DATABASE(self)->str:
         return self._DB_DATABASE
     
+    def getWEB_HOST(self) ->str:
+        return self._WEB_HOST
+    
+    def getWEB_PORT(self) ->int:
+        return self._WEB_PORT
+    
+    def getWEB_PROTOCOL(self) ->str:
+        return self._WEB_PROTOCOL
+
 
 CONFIG = Config()
