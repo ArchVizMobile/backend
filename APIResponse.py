@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import List
 
 import jsonpickle
@@ -54,14 +55,37 @@ class Room:
     def __str__(self) -> str:
         return jsonpickle.encode(self, unpicklable=False)
 
+class FeatureType(Enum):
+    WINDOW = 1
+    DOOR = 2
+
+class Handler(jsonpickle.handlers.BaseHandler):
+    def flatten(self, obj: FeatureType, data):
+        return obj.name
+
+jsonpickle.handlers.registry.register(FeatureType, Handler)
+
+class Feature(SimplePosition):
+    def __init__(self,fromPosition:int,toPosition:int,hinge:int,openLeft:bool,style:str,z:int,height:int,type:FeatureType) -> None:
+        self.fromPosition = fromPosition
+        self.toPosition = toPosition
+        self.hinge = hinge
+        self.openLeft = openLeft
+        self.style = style
+        self.z = z
+        self.height = height
+        self.type = type
+        pass
+    def __str__(self) -> str:
+        return jsonpickle.encode(self, unpicklable=False)
+
 class Wall(SimplePosition):
-    def __init__(self,fromPosition:Position,toPosition:Position,isHorizontal:bool,isOuterWall:bool,doors:List[Door],windows:List[Window],depth:int,height:int) -> None:
+    def __init__(self,fromPosition:Position,toPosition:Position,isHorizontal:bool,isOuterWall:bool,features:List[Feature],depth:int,height:int) -> None:
         self.fromPosition = fromPosition
         self.toPosition = toPosition
         self.isHorizontal = isHorizontal
         self.isOuterWall = isOuterWall
-        self.doors = doors
-        self.windows = windows
+        self.features = features
         self.depth = depth
         self.height = height
         pass

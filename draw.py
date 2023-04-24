@@ -6,7 +6,7 @@ import jsonpickle
 import numpy as np
 from PIL import Image, ImageDraw,ImageFont
 import time
-from APIResponse import Room, Wall
+from APIResponse import FeatureType, Room, Wall
 from config import CONFIG
 
 def draw(junctions,wallsobj:List[Wall],rooms:List[Room]):
@@ -50,67 +50,67 @@ def draw(junctions,wallsobj:List[Wall],rooms:List[Room]):
         # fill = f'#%02X%02X%02X' % (r(),r(),r())
         img1.rectangle([(wall.fromPosition.x,wall.fromPosition.y),(wall.toPosition.x,wall.toPosition.y)], fill)
 
-        for door in wall.doors:
-            fr = [wall.fromPosition.x,wall.fromPosition.y]
-            to = [wall.fromPosition.x,wall.fromPosition.y]
+        for feature in wall.features:
+            if feature.type == FeatureType.DOOR:
+                fr = [wall.fromPosition.x,wall.fromPosition.y]
+                to = [wall.fromPosition.x,wall.fromPosition.y]
 
-            frHinge = [wall.fromPosition.x,wall.fromPosition.y]
-            toHinge = [wall.fromPosition.x,wall.fromPosition.y]
+                frHinge = [wall.fromPosition.x,wall.fromPosition.y]
+                toHinge = [wall.fromPosition.x,wall.fromPosition.y]
 
-            frOpen = [wall.fromPosition.x,wall.fromPosition.y]
-            toOpen = [wall.fromPosition.x,wall.fromPosition.y]
+                frOpen = [wall.fromPosition.x,wall.fromPosition.y]
+                toOpen = [wall.fromPosition.x,wall.fromPosition.y]
 
-            if wall.isHorizontal:
+                if wall.isHorizontal:
 
-                frHinge[0] = frHinge[0] + door.hinge + (wall_width if door.hinge==door.fromPosition else 0)
-                toHinge[0] = toHinge[0] + door.hinge + (-wall_width if door.hinge!=door.fromPosition else 0)
-                toHinge[1] = toHinge[1] + wall_width
+                    frHinge[0] = frHinge[0] + feature.hinge + (wall_width if feature.hinge==feature.fromPosition else 0)
+                    toHinge[0] = toHinge[0] + feature.hinge + (-wall_width if feature.hinge!=feature.fromPosition else 0)
+                    toHinge[1] = toHinge[1] + wall_width
 
-                fr[0] = fr[0] + door.fromPosition
-                to[0] = to[0] + door.toPosition
-                to[1] = to[1] + wall_width
+                    fr[0] = fr[0] + feature.fromPosition
+                    to[0] = to[0] + feature.toPosition
+                    to[1] = to[1] + wall_width
 
-                frOpen[0] = frOpen[0] + door.hinge + (wall_width if door.hinge==door.fromPosition else 0)
-                frOpen[1] = frOpen[1] + (-wall_width if door.openLeft else wall_width)
-                toOpen[0] = toOpen[0] + door.hinge + (-wall_width if door.hinge!=door.fromPosition else 0)
-                toOpen[1] = toOpen[1] + wall_width + (-wall_width if door.openLeft else wall_width)
+                    frOpen[0] = frOpen[0] + feature.hinge + (wall_width if feature.hinge==feature.fromPosition else 0)
+                    frOpen[1] = frOpen[1] + (-wall_width if feature.openLeft else wall_width)
+                    toOpen[0] = toOpen[0] + feature.hinge + (-wall_width if feature.hinge!=feature.fromPosition else 0)
+                    toOpen[1] = toOpen[1] + wall_width + (-wall_width if feature.openLeft else wall_width)
 
-            else:
-                frHinge[0] = frHinge[0] - wall_width
-                frHinge[1] = frHinge[1] + door.hinge + (wall_width if door.hinge==door.fromPosition else 0)
-                toHinge[1] = toHinge[1] + door.hinge + (-wall_width if door.hinge!=door.fromPosition else 0)
+                else:
+                    frHinge[0] = frHinge[0] - wall_width
+                    frHinge[1] = frHinge[1] + feature.hinge + (wall_width if feature.hinge==feature.fromPosition else 0)
+                    toHinge[1] = toHinge[1] + feature.hinge + (-wall_width if feature.hinge!=feature.fromPosition else 0)
 
-                fr[0] = fr[0] - wall_width
-                fr[1] = fr[1] + door.fromPosition
-                to[1] = to[1] + door.toPosition
+                    fr[0] = fr[0] - wall_width
+                    fr[1] = fr[1] + feature.fromPosition
+                    to[1] = to[1] + feature.toPosition
 
-                frOpen[0] = frOpen[0] + (-wall_width if door.openLeft else wall_width) - wall_width
-                frOpen[1] = frOpen[1] + door.hinge + (wall_width if door.hinge==door.fromPosition else 0)
-                toOpen[0] = toOpen[0] + (-wall_width if door.openLeft else wall_width)
-                toOpen[1] = toOpen[1] + door.hinge + (-wall_width if door.hinge!=door.fromPosition else 0)
+                    frOpen[0] = frOpen[0] + (-wall_width if feature.openLeft else wall_width) - wall_width
+                    frOpen[1] = frOpen[1] + feature.hinge + (wall_width if feature.hinge==feature.fromPosition else 0)
+                    toOpen[0] = toOpen[0] + (-wall_width if feature.openLeft else wall_width)
+                    toOpen[1] = toOpen[1] + feature.hinge + (-wall_width if feature.hinge!=feature.fromPosition else 0)
 
-            img1.rectangle([tuple(fr),tuple(to)], fill="#f00")
-            img1.rectangle([tuple(frHinge),tuple(toHinge)], fill="#000")
-            img1.rectangle([tuple(frOpen),tuple(toOpen)], fill="#f00")
+                img1.rectangle([tuple(fr),tuple(to)], fill="#f00")
+                img1.rectangle([tuple(frHinge),tuple(toHinge)], fill="#000")
+                img1.rectangle([tuple(frOpen),tuple(toOpen)], fill="#f00")
+            elif feature.type==FeatureType.WINDOW:
+                fr = [wall.fromPosition.x,wall.fromPosition.y]
+                to = [wall.fromPosition.x,wall.fromPosition.y]
+                if wall.isHorizontal:
 
-        for window in wall.windows:
-            fr = [wall.fromPosition.x,wall.fromPosition.y]
-            to = [wall.fromPosition.x,wall.fromPosition.y]
-            if wall.isHorizontal:
+                    fr[0] = fr[0] + feature.fromPosition
+                    to[0] = to[0] + feature.toPosition
+                    to[1] = to[1] + wall_width
 
-                fr[0] = fr[0] + window.fromPosition
-                to[0] = to[0] + window.toPosition
-                to[1] = to[1] + wall_width
+                else:
+                    fr[0] = fr[0] - wall_width
+                    fr[1] = fr[1] + feature.fromPosition
+                    to[1] = to[1] + feature.toPosition
 
-            else:
-                fr[0] = fr[0] - wall_width
-                fr[1] = fr[1] + window.fromPosition
-                to[1] = to[1] + window.toPosition
-
-            r = lambda: random.randint(0,255)
-            fill = f'#%02X%02X%02X' % (r(),r(),r())
-            fill = "#00f"
-            img1.rectangle([tuple(fr),tuple(to)], fill=fill)
+                r = lambda: random.randint(0,255)
+                fill = f'#%02X%02X%02X' % (r(),r(),r())
+                fill = "#00f"
+                img1.rectangle([tuple(fr),tuple(to)], fill=fill)
 
 
 

@@ -3,7 +3,7 @@ from typing import List
 
 import jsonpickle
 
-from APIResponse import APIResponse, Door, Position, Room, SimplePosition, Wall, Window
+from APIResponse import APIResponse, Door, Feature, FeatureType, Position, Room, SimplePosition, Wall, Window
 from config import CONFIG
 from generateCorners import generateCorners
 
@@ -32,12 +32,6 @@ def getData():
 
     rooms = generateCorners()
 
-    # rooms = [[{'x': 100, 'y': 100, 'generated': True}, {'x': 574, 'y': 100, 'generated': True}, {'x': 1044, 'y': 100, 'generated': True}], [{'x': 100, 'y': 325, 'generated': True}, {'x': 100, 'y': 325, 'generated': False}, {'x': 373, 'y': 325, 'generated': True}, {'x': 574, 'y': 325, 'generated': False}, {'x': 612, 'y': 325, 'generated': True}, {'x': 970, 'y': 325, 'generated': True}, {'x': 1044, 'y': 325, 'generated': False}], [{'x': 100, 'y': 795, 'generated': True}, {'x': 100, 'y': 795, 'generated': False}, {'x': 373, 'y': 795, 'generated': False}, {'x': 558, 'y': 795, 'generated': True}, {'x': 612, 'y': 795, 'generated': False}, {'x': 948, 'y': 795, 'generated': True}, {'x': 970, 'y': 795, 'generated': False}, {'x': 1210, 'y': 795, 'generated': True}, {'x': 1496, 'y': 795, 'generated': True}], [{'x': 100, 'y': 995, 'generated': False}, {'x': 558, 'y': 995, 'generated': False}, {'x': 948, 'y': 995, 'generated': False}, {'x': 1210, 'y': 995, 'generated': False}, {'x': 1496, 'y': 995, 'generated': False}]]
-    # rooms = [[{'x': 100, 'y': 100, 'generated': True}, {'x': 413, 'y': 100, 'generated': True}, {'x': 650, 'y': 100, 'generated': True}, {'x': 1028, 'y': 100, 'generated': True}], [{'x': 100, 'y': 441, 'generated': True}, {'x': 100, 'y': 441, 'generated': False}, {'x': 413, 'y': 441, 'generated': False}, {'x': 441, 'y': 441, 'generated': True}, {'x': 650, 'y': 441, 'generated': False}, {'x': 905, 'y': 441, 'generated': True}, {'x': 1028, 'y': 441, 'generated': False}, {'x': 1152, 'y': 441, 'generated': True}], [{'x': 100, 'y': 724, 'generated': True}, {'x': 100, 'y': 724, 'generated': False}, {'x': 353, 'y': 724, 'generated': True}, {'x': 441, 'y': 724, 'generated': False}, {'x': 737, 'y': 724, 'generated': True}, {'x': 905, 'y': 724, 'generated': False}, {'x': 1013, 'y': 724, 'generated': True}, {'x': 1152, 'y': 724, 'generated': False}], [{'x': 100, 'y': 1088, 'generated': True}, {'x': 100, 'y': 1088, 'generated': False}, {'x': 353, 'y': 1088, 'generated': False}, {'x': 534, 'y': 1088, 'generated': True}, {'x': 737, 'y': 1088, 'generated': False}, {'x': 810, 'y': 1088, 'generated': True}, {'x': 1013, 'y': 1088, 'generated': False}, {'x': 1302, 'y': 1088, 'generated': True}], [{'x': 100, 'y': 1303, 'generated': True}, {'x': 100, 'y': 1303, 'generated': False}, {'x': 413, 'y': 1303, 'generated': True}, {'x': 534, 'y': 1303, 'generated': False}, {'x': 656, 'y': 1303, 'generated': True}, {'x': 810, 'y': 1303, 'generated': False}, {'x': 1302, 'y': 1303, 'generated': False}], [{'x': 100, 'y': 1503, 'generated': False}, {'x': 413, 'y': 1503, 'generated': False}, {'x': 656, 'y': 1503, 'generated': False}]]
-    
-    # Aktuell Kaputt:
-    # rooms = [[{'x': 100, 'y': 100, 'generated': True}, {'x': 333, 'y': 100, 'generated': True}, {'x': 731, 'y': 100, 'generated': True}, {'x': 1126, 'y': 100, 'generated': True}, {'x': 1370, 'y': 100, 'generated': True}, {'x': 1730, 'y': 100, 'generated': True}], [{'x': 100, 'y': 477, 'generated': True}, {'x': 100, 'y': 477, 'generated': False}, {'x': 333, 'y': 477, 'generated': False}, {'x': 339, 'y': 477, 'generated': True}, {'x': 731, 'y': 477, 'generated': False}, {'x': 837, 'y': 477, 'generated': True}, {'x': 1126, 'y': 477, 'generated': False}, {'x': 1370, 'y': 477, 'generated': False}, {'x': 1730, 'y': 477, 'generated': False}], [{'x': 100, 'y': 892, 'generated': True}, {'x': 100, 'y': 892, 'generated': False}, {'x': 339, 'y': 892, 'generated': False}, {'x': 347, 'y': 892, 'generated': True}, {'x': 567, 'y': 892, 'generated': True}, {'x': 837, 'y': 892, 'generated': False}, {'x': 918, 'y': 892, 'generated': True}, {'x': 1370, 'y': 892, 'generated': True}], [{'x': 100, 'y': 1324, 'generated': True}, {'x': 100, 'y': 1324, 'generated': False}, {'x': 347, 'y': 1324, 'generated': False}, {'x': 548, 'y': 1324, 'generated': True}, {'x': 567, 'y': 1324, 'generated': False}, {'x': 918, 'y': 1324, 'generated': False}, {'x': 936, 'y': 1324, 'generated': True}, {'x': 1370, 'y': 1324, 'generated': False}], [{'x': 100, 'y': 1575, 'generated': True}, {'x': 100, 'y': 1575, 'generated': False}, {'x': 488, 'y': 1575, 'generated': True}, {'x': 548, 'y': 1575, 'generated': False}, {'x': 751, 'y': 1575, 'generated': True}, {'x': 936, 'y': 1575, 'generated': False}, {'x': 1191, 'y': 1575, 'generated': True}], [{'x': 100, 'y': 1775, 'generated': False}, {'x': 488, 'y': 1775, 'generated': False}, {'x': 751, 'y': 1775, 'generated': False}, {'x': 1191, 'y': 1775, 'generated': False}]]
-    # rooms = [[{'x': 100, 'y': 100, 'generated': True}, {'x': 458, 'y': 100, 'generated': True}, {'x': 686, 'y': 100, 'generated': True}, {'x': 1137, 'y': 100, 'generated': True}, {'x': 1343, 'y': 100, 'generated': True}, {'x': 1572, 'y': 100, 'generated': True}], [{'x': 100, 'y': 412, 'generated': True}, {'x': 100, 'y': 412, 'generated': False}, {'x': 378, 'y': 412, 'generated': True}, {'x': 458, 'y': 412, 'generated': False}, {'x': 686, 'y': 412, 'generated': False}, {'x': 747, 'y': 412, 'generated': True}, {'x': 960, 'y': 412, 'generated': True}, {'x': 1137, 'y': 412, 'generated': False}, {'x': 1343, 'y': 412, 'generated': False}, {'x': 1404, 'y': 412, 'generated': True}, {'x': 1572, 'y': 412, 'generated': False}], [{'x': 100, 'y': 723, 'generated': True}, {'x': 100, 'y': 723, 'generated': False}, {'x': 322, 'y': 723, 'generated': True}, {'x': 378, 'y': 723, 'generated': False}, {'x': 568, 'y': 723, 'generated': True}, {'x': 747, 'y': 723, 'generated': False}, {'x': 886, 'y': 723, 'generated': True}, {'x': 960, 'y': 723, 'generated': False}, {'x': 1404, 'y': 723, 'generated': False}], [{'x': 100, 'y': 1170, 'generated': True}, {'x': 100, 'y': 1170, 'generated': False}, {'x': 306, 'y': 1170, 'generated': True}, {'x': 322, 'y': 1170, 'generated': False}, {'x': 559, 'y': 1170, 'generated': True}, {'x': 568, 'y': 1170, 'generated': False}, {'x': 886, 'y': 1170, 'generated': False}, {'x': 969, 'y': 1170, 'generated': True}, {'x': 1299, 'y': 1170, 'generated': True}], [{'x': 100, 'y': 1370, 'generated': False}, {'x': 306, 'y': 1370, 'generated': False}, {'x': 559, 'y': 1370, 'generated': False}, {'x': 969, 'y': 1370, 'generated': False}, {'x': 1299, 'y': 1370, 'generated': False}]]  
     print(rooms)
 
     wall_width = CONFIG.getWALL_WIDTH()
@@ -49,13 +43,14 @@ def getData():
             room1["x"] = room1["x"] - (room1["x"] % 20)
             room1["y"] = room1["y"] - (room1["y"] % 20)
 
+    # Remove double points
     for idx,room in enumerate(rooms):
         for idx1,room1 in enumerate(room):
             for idx2,room2 in enumerate(room):
                 if idx1!=idx2 and room1["x"]==room2["x"] and room1["y"]==room2["y"]:
                     del room[idx2]
-    
 
+    # Generate empty joints from points
     joints = []
     for idx,y in enumerate(rooms):
         for x in y:
@@ -77,26 +72,26 @@ def getData():
                     "right": False
                 }})
             
+    # Connect joints together
     for idx,room in enumerate(joints):
         for idx1,room1 in enumerate(joints):
-            # if idx!=idx1:
-                if room["left"] > room1["left"] and room["top"]==room1["top"] and (room["corner"]["left"]==None or room["left"] > joints[room["corner"]["left"]]["left"]):
-                    room["corner"]["left"]=idx1
+            if room["left"] > room1["left"] and room["top"]==room1["top"] and (room["corner"]["left"]==None or room["left"] > joints[room["corner"]["left"]]["left"]):
+                room["corner"]["left"]=idx1
 
-                if room["left"] < room1["left"] and room["top"]==room1["top"] and (room["corner"]["right"]==None or room["left"] > joints[room["corner"]["right"]]["left"]):
-                    room["corner"]["right"]=idx1
+            if room["left"] < room1["left"] and room["top"]==room1["top"] and (room["corner"]["right"]==None or room["left"] > joints[room["corner"]["right"]]["left"]):
+                room["corner"]["right"]=idx1
 
-                if room["top"] > room1["top"] and room["left"]==room1["left"] and (room["corner"]["top"]==None or room["top"] > joints[room["corner"]["top"]]["top"]):
-                    if room["yIndex"]==room1["yIndex"]-1 or room["yIndex"]==room1["yIndex"]+1:
-                        room["corner"]["top"]=idx1
+            if room["top"] > room1["top"] and room["left"]==room1["left"] and (room["corner"]["top"]==None or room["top"] > joints[room["corner"]["top"]]["top"]):
+                if room["yIndex"]==room1["yIndex"]-1 or room["yIndex"]==room1["yIndex"]+1:
+                    room["corner"]["top"]=idx1
 
-                if room["top"] < room1["top"] and room["left"]==room1["left"] and (room["corner"]["bottom"]==None or room["top"] > joints[room["corner"]["bottom"]]["top"]):
-                    if room["yIndex"]==room1["yIndex"]-1 or room["yIndex"]==room1["yIndex"]+1:
-                        room["corner"]["bottom"]=idx1
-
+            if room["top"] < room1["top"] and room["left"]==room1["left"] and (room["corner"]["bottom"]==None or room["top"] > joints[room["corner"]["bottom"]]["top"]):
+                if room["yIndex"]==room1["yIndex"]-1 or room["yIndex"]==room1["yIndex"]+1:
+                    room["corner"]["bottom"]=idx1
 
     maxLen = -1
 
+    # Function to loop arround the outer wall to detect it as such
     def traverse(idx,move,n):
         if idx == None:
             return
@@ -155,6 +150,7 @@ def getData():
 
     traverse(0,"right",0)
 
+    # Checking if joint target is also outer wall
     for idx,joint in enumerate(joints):
         if joints[idx]["corner"]["top"]!=None:
             joints[idx]["targetIsOuterwall"]["top"] = joints[joints[idx]["corner"]["top"]]["outerwall"]
@@ -169,6 +165,7 @@ def getData():
 
     wallsobj:List[Wall] = []
 
+    # Building walls from joint info (only to right and bottom joints to prevent double casting)
     for idx,x in enumerate(joints):
         depth = int(random.randrange(20,21))
         height = globalHeight #int(random.randrange(250,250))
@@ -179,8 +176,7 @@ def getData():
                 toPosition=Position(int(joints[x["corner"]["right"]]["left"]-wall_width_half),int(joints[x["corner"]["right"]]["top"]+wall_width_half)),
                 isHorizontal=True,
                 isOuterWall=x["targetIsOuterwall"]["right"] and x["outerwall"] and (not x["targetIsOuterwall"]["top"] or not x["targetIsOuterwall"]["bottom"]),
-                doors=[],
-                windows=[],
+                features=[],
                 depth=depth,
                 height=height,
             ))
@@ -191,14 +187,12 @@ def getData():
                 toPosition=Position(int(joints[x["corner"]["bottom"]]["left"]-wall_width_half),int(joints[x["corner"]["bottom"]]["top"]+wall_width_half)),
                 isHorizontal=False,
                 isOuterWall=x["targetIsOuterwall"]["bottom"] and x["outerwall"] and (not x["targetIsOuterwall"]["right"] or not x["targetIsOuterwall"]["left"]),
-                doors=[],
-                windows=[],
+                features=[],
                 depth=depth,
                 height=height,
             ))
-    
 
-
+    # Differencing between inner and outer walls
     outerwalls = []
     innerwalls = []
     for idx,wall in enumerate(wallsobj):
@@ -207,7 +201,7 @@ def getData():
         else:
             innerwalls.append({"idx":idx,"wall":wall})
 
-    # outer walls doors
+    # Adding Doors to outer walls (entrance doors)
     number_of_doors = int(random.randrange(2,3))
     for _ in range(number_of_doors):
         idx = random.randrange(0,len(outerwalls))
@@ -215,8 +209,8 @@ def getData():
 
         doorWidth = int(random.randrange(120,140))
 
-        checkVertical = not o.isHorizontal and len(o.doors)==0 and len(o.windows)==0 and o.toPosition.y-o.fromPosition.y > doorWidth*2
-        checkHorizontal = o.isHorizontal and len(o.doors)==0 and len(o.windows)==0 and o.toPosition.x-o.fromPosition.x > doorWidth*2
+        checkVertical = not o.isHorizontal and len(o.features)==0 and o.toPosition.y-o.fromPosition.y > doorWidth*2
+        checkHorizontal = o.isHorizontal and len(o.features)==0 and o.toPosition.x-o.fromPosition.x > doorWidth*2
 
         if checkVertical:
             fromPosition = random.randrange(10,o.toPosition.y-o.fromPosition.y - 20 - doorWidth)
@@ -227,11 +221,10 @@ def getData():
         if checkVertical or checkHorizontal:
             toPosition = fromPosition + doorWidth
             hinge = fromPosition if random.random() > 0.5 else toPosition
-            intersecting = checkIntersecting(o.doors,fromPosition,toPosition) or \
-                            checkIntersecting(o.windows,fromPosition,toPosition)
+            intersecting = checkIntersecting(o.features,fromPosition,toPosition)
 
             if not intersecting:
-                o.doors.append(Door(
+                o.features.append(Feature(
                     fromPosition = fromPosition,
                     toPosition = toPosition,
                     hinge = hinge,
@@ -239,9 +232,10 @@ def getData():
                     style = "default",
                     height = int(random.randrange(180,220)),
                     z = 0,
+                    type = FeatureType.DOOR
                 ))
 
-    # outer walls windows
+    # Adding Windows to outer walls
     windowHeight = int(random.randrange(80,150))
     maxWinHeight = wallsobj[0].height - windowHeight  - 80
     if maxWinHeight <= 80:
@@ -266,19 +260,21 @@ def getData():
             fromPosition = fromPosition - (fromPosition % 20)
             toPosition = fromPosition + doorWidth
             toPosition = toPosition - (fromPosition % 20)
-            intersecting = checkIntersecting(o.doors,fromPosition,toPosition) or \
-                            checkIntersecting(o.windows,fromPosition,toPosition)
+            intersecting = checkIntersecting(o.features,fromPosition,toPosition)
 
             if not intersecting:
-                o.windows.append(Window(
+                o.features.append(Feature(
                     fromPosition = fromPosition,
                     toPosition = toPosition,
                     style = "default",
                     height = windowHeight,
                     z = windowZ,
+                    type = FeatureType.WINDOW,
+                    hinge=-1,
+                    openLeft=False
                 ))
 
-    # inner walls
+    # Adding Doors to inner walls
     for wall in innerwalls:
         o:Wall = wallsobj[wall["idx"]]
 
@@ -296,11 +292,10 @@ def getData():
         if checkVertical or checkHorizontal:
             toPosition = fromPosition + doorWidth
             hinge = fromPosition if random.random() > 0.5 else toPosition
-            intersecting = checkIntersecting(o.doors,fromPosition,toPosition) or \
-                            checkIntersecting(o.windows,fromPosition,toPosition)
+            intersecting = checkIntersecting(o.features,fromPosition,toPosition)
 
             if not intersecting:
-                o.doors.append(Door(
+                o.features.append(Feature(
                     fromPosition = fromPosition,
                     toPosition = toPosition,
                     hinge = hinge,
@@ -308,8 +303,18 @@ def getData():
                     style = "default",
                     height = int(random.randrange(180,220)),
                     z = int(random.randrange(0,5)),
+                    type = FeatureType.DOOR
                 ))
 
+    # Sorting Wall Features
+    for wall in innerwalls:
+        o:Wall = wallsobj[wall["idx"]]
+        o.features = sorted(o.features,key=lambda x: x.fromPosition,reverse=False)
+
+    # Sorting Wall Features
+    for wall in outerwalls:
+        o:Wall = wallsobj[wall["idx"]]
+        o.features = sorted(o.features,key=lambda x: x.fromPosition,reverse=False)
 
     response.walls = wallsobj
 
