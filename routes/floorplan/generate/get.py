@@ -37,7 +37,7 @@ def GET(self,dbCollection,search):
         walls,junctions,rooms = "no","no","no"
     now = datetime.now()
     dt_string = now.strftime("%d.%m.%Y %H:%M:%S")
-
+    id = ""
     data = {
         "success": walls!="no",
         "name": f"Generated Floorplan from {dt_string}",
@@ -47,6 +47,8 @@ def GET(self,dbCollection,search):
         "scale": s,
     }
     json = jsonpickle.encode(data, unpicklable=False)
-    if data["success"]:
-        x = dbCollection.insert_one(jsonpickle.decode(json))
+    if walls!="no":
+        id = dbCollection.insert_one(jsonpickle.decode(json))
+        data["_id"] = str(id.inserted_id)
+
     return data
