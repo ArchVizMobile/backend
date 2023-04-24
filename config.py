@@ -20,9 +20,14 @@ class Config:
         self._VERTICAL_ROOMZ_COUNT = int(os.environ.get("VERTICAL_ROOMZ_COUNT")),
         self._HORIZOHNTAHL_ROOMZ_COUNT = int(os.environ.get("HORIZOHNTAHL_ROOMZ_COUNT")),
         self._WALL_WIDTH = int(os.environ.get("WALL_WIDTH")),
-    def __str__(self) -> str:
-        return f"IMAGE_WIDTH={self._IMAGE_WIDTH[0]} - IMAGE_HEIGHT={self._IMAGE_HEIGHT[0]} - SERVER_PORT={self._SERVER_PORT[0]} - SAVE_TEMP={self._SAVE_TEMP[0]} - SAVE_STATIC={self._SAVE_STATIC[0]} - VERTICAL_ROOMZ_COUNT={self._VERTICAL_ROOMZ_COUNT[0]} - HORIZOHNTAHL_ROOMZ_COUNT={self._HORIZOHNTAHL_ROOMZ_COUNT[0]}"
 
+        self._DB_HOST = os.environ.get("DB_HOST") # =api.lisha-app.com
+        self._DB_PORT = int(os.environ.get("DB_PORT")) # =27017
+        self._DB_DATABASE = os.environ.get("DB_DATABASE") # =archviz
+    
+    def __str__(self) -> str:
+        return f"IMAGE_WIDTH={self._IMAGE_WIDTH[0]} - IMAGE_HEIGHT={self._IMAGE_HEIGHT[0]} - SERVER_PORT={self._SERVER_PORT[0]} - SAVE_TEMP={self._SAVE_TEMP[0]} - SAVE_STATIC={self._SAVE_STATIC[0]} - VERTICAL_ROOMZ_COUNT={self._VERTICAL_ROOMZ_COUNT[0]} - HORIZOHNTAHL_ROOMZ_COUNT={self._HORIZOHNTAHL_ROOMZ_COUNT[0]} DB_HOST={self.DB_HOST} - DB_PORT={self.DB_PORT} - DB_DATABASE={self.DB_DATABASE}"
+ 
     def getIMAGE_WIDTH(self)->int:
         return self._IMAGE_WIDTH[0]
 
@@ -47,5 +52,14 @@ class Config:
     def getWALL_WIDTH(self)->int:
         return self._WALL_WIDTH[0]
 
+    def getDB_HOST(self)->str:
+        return self._DB_HOST
+    
+    def getDB_PORT(self)->int:
+        return self._DB_PORT
+    
+    def getDB_DATABASE(self)->str:
+        return self._DB_DATABASE
+    
 
 CONFIG = Config()
