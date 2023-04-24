@@ -69,15 +69,23 @@ class Server(BaseHTTPRequestHandler):
         # print(search)
 
         if path=="/image" and "id" in search:
-            self.send_header('Content-type','image/jpeg')
+            self.send_header('Content-type','image/png')
 
-            data = mycollection.find_one({"_id":ObjectId(search["id"])})
 
-            im = drawAndReturnFromDatabase(data["junctions"],data["walls"],data["rooms"])
-            img_byte_arr = io.BytesIO()
-            im.save(img_byte_arr, format='PNG')
-            img_byte_arr = img_byte_arr.getvalue()
-            self.wfile.write(img_byte_arr)
+            search = {"_id":ObjectId(search["id"])}
+            cnt = mycollection.count_documents(search)
+            if cnt > 0:
+                data = mycollection.find_one(search)
+
+                im = drawAndReturnFromDatabase(data["junctions"],data["walls"],data["rooms"])
+                img_byte_arr = io.BytesIO()
+                im.save(img_byte_arr, format='PNG')
+                img_byte_arr = img_byte_arr.getvalue()
+                self.wfile.write(img_byte_arr)
+            else:
+                with open("notfound.png", 'rb') as file_handle:
+                    file = file_handle.read()
+                    return self.wfile.write(file)
             return
 
         if path in API["GET"]:
