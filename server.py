@@ -67,6 +67,12 @@ class Server(BaseHTTPRequestHandler):
 
             self.wfile.write(json.encode())
             return
+        else:
+            self.send_header('Content-type','application/json')
+            self.end_headers()
+
+            self.wfile.write(jsonpickle.encode({"success":False,"error":"Route not existing!"}, unpicklable=False).encode())
+            return
 
     # GET sends back a Hello world message
     def do_GET(self):
@@ -108,7 +114,8 @@ class Server(BaseHTTPRequestHandler):
                     return self.wfile.write(file)
             return
 
-        if path in API["GET"]:
+
+        elif path in API["GET"]:
             self.send_header('Content-type','application/json')
             self.end_headers()
             # self.
@@ -118,7 +125,7 @@ class Server(BaseHTTPRequestHandler):
             self.wfile.write(json.encode())
             return
 
-        if self.path.startswith("/get"):
+        elif self.path.startswith("/get"):
             self.send_header('Content-type','application/json')
             self.end_headers()
             search = {"_id":ObjectId(self.path.split("/")[2])}
@@ -141,7 +148,7 @@ class Server(BaseHTTPRequestHandler):
             self.wfile.write(json.encode())
             return
         
-        if self.path.endswith("/"):
+        elif self.path.endswith("/"):
             self.send_header('Content-type','application/json')
             self.end_headers()
             ret = API["GET"][""](self,search={},dbCollection=mycollection)
@@ -149,12 +156,12 @@ class Server(BaseHTTPRequestHandler):
 
             self.wfile.write(json.encode())
             return
-        if self.path.endswith("/dash.html"):
+        elif self.path.endswith("/dash.html"):
             self.send_header('Content-type','text/html')
             self.end_headers()
             self.wfile.write(open('dash.html', 'rb'))
             return
-        if self.path.endswith("/last.jpg"):
+        elif self.path.endswith("/last.jpg"):
             self.send_header('Content-type','image/jpeg')
             self.end_headers()
             with open("whh.jpg", 'rb') as file_handle:
@@ -162,7 +169,12 @@ class Server(BaseHTTPRequestHandler):
                 return self.wfile.write(file)
             #self.wfile.write(open('./whh.jpg', 'rb'))
             return
-        self.wfile.write("no".encode())
+        else:
+            self.send_header('Content-type','application/json')
+            self.end_headers()
+
+            self.wfile.write(jsonpickle.encode({"success":False,"error":"Route not existing!"}, unpicklable=False).encode())
+            return
 
 
 def run(server_class=HTTPServer, handler_class=Server, port=CONFIG.getSERVER_PORT()):
