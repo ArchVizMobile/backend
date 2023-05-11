@@ -11,8 +11,7 @@ def GET(self,dbCollection,search):
 
     files = glob.glob("uploaded/*.pdf")
     basefile = files[random.randint(0,len(files)-1)]
-    print(basefile)
-    basefile = "uploaded/Alto 620.pdf"
+    # basefile = "uploaded/Alto 620.pdf"
 
 
     # TODO: Handle file upload?
@@ -85,8 +84,8 @@ def GET(self,dbCollection,search):
         }
 
     chosen_plan = random.randint(0,len(all_lns)-1)
-    chosen_plan = len(all_lns)-1
-    print(f"no {chosen_plan} of {len(all_lns)}")
+    # chosen_plan = len(all_lns)-1
+    print(f"@{basefile}: no {chosen_plan} of {len(all_lns)}")
 
     walls = []
     for wall in all_lns[chosen_plan]:
@@ -110,7 +109,7 @@ def GET(self,dbCollection,search):
             "height": 391
         })
 
-    # os.system(f"rm -rf uploaded/{t}")
+    os.system(f"rm -rf uploaded/{t}")
     
     return {
         "_id": "-1",
