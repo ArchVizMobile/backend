@@ -41,6 +41,7 @@ def GET(self,dbCollection,search):
                 if item[0]<min:
                     min[0] = item[0][0]
                     min[1] = item[0][1]
+
             # print(min)
             for idx,item in enumerate(lns):
                 lns[idx][0][0] = (lns[idx][0][0] - min[0])
@@ -51,7 +52,7 @@ def GET(self,dbCollection,search):
                 isHorizontal = lns[idx][1][0]-lns[idx][0][0] > lns[idx][1][1]-lns[idx][0][1]
                 
                 depth = lns[idx][1][0]-lns[idx][0][0] if not isHorizontal else lns[idx][1][1]-lns[idx][0][1]
-                if depth < minDepth:
+                if depth < minDepth and depth >= 1:
                     minDepth = depth
             
             scale = 30/minDepth
