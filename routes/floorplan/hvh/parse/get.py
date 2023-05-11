@@ -88,27 +88,31 @@ def GET(self,dbCollection,search):
     # chosen_plan = len(all_lns)-1
     print(f"@{basefile}: no {chosen_plan} of {len(all_lns)}")
 
-    walls = []
-    for wall in all_lns[chosen_plan]:
-        isHorizontal = wall[1][0]-wall[0][0] > wall[1][1]-wall[0][1]
-        
-        depth = wall[1][0]-wall[0][0] if not isHorizontal else wall[1][1]-wall[0][1]
+    data = []
+    # [chosen_plan]
+    for all in all_lns:
+        d = []
+        for wall in all:
+            isHorizontal = wall[1][0]-wall[0][0] > wall[1][1]-wall[0][1]
+            
+            depth = wall[1][0]-wall[0][0] if not isHorizontal else wall[1][1]-wall[0][1]
 
-        walls.append({
-            "fromPosition": {
-                "x": wall[0][0],
-                "y": wall[0][1]
-            },
-            "toPosition": {
-                "x": wall[1][0],
-                "y": wall[1][1]
-            },
-            "isHorizontal": isHorizontal,
-            "isOuterWall": True,
-            "features": [],
-            "depth": depth,
-            "height": 391
-        })
+            d.append({
+                "fromPosition": {
+                    "x": wall[0][0],
+                    "y": wall[0][1]
+                },
+                "toPosition": {
+                    "x": wall[1][0],
+                    "y": wall[1][1]
+                },
+                "isHorizontal": isHorizontal,
+                "isOuterWall": True,
+                "features": [],
+                "depth": depth,
+                "height": 391
+            })
+        data.append(d)
 
     os.system(f"rm -rf uploaded/{t}")
     
@@ -120,8 +124,9 @@ def GET(self,dbCollection,search):
             "chosen_plan":chosen_plan
         },
         "success": True,
-        "name": basefile.split("/")[1].split(".")[0],
-        "walls": walls,
+        "name": "Heinz von Heiden "+basefile.split("/")[1].split(".")[0],
+        "walls": data[chosen_plan],
+        "all_walls": data,
         "junctions": [],
         "rooms": [],
         "scale": scale
