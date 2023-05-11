@@ -24,6 +24,7 @@ def GET(self,dbCollection,search):
     scale = 3
 
     for file in glob.glob(f"uploaded/{t}/*.svg"):
+        minDepth = 999999999999
         lns = []
         with open(file) as handler:
             lines = handler.read().split("\n")
@@ -43,11 +44,26 @@ def GET(self,dbCollection,search):
                     min[1] = item[0][1]
             # print(min)
             for idx,item in enumerate(lns):
-                lns[idx][0][0] = (lns[idx][0][0] - min[0])*scale
-                lns[idx][0][1] = (lns[idx][0][1] - min[1])*scale
+                lns[idx][0][0] = (lns[idx][0][0] - min[0])
+                lns[idx][0][1] = (lns[idx][0][1] - min[1])
 
-                lns[idx][1][0] = (lns[idx][1][0] - min[0])*scale
-                lns[idx][1][1] = (lns[idx][1][1] - min[1])*scale
+                lns[idx][1][0] = (lns[idx][1][0] - min[0])
+                lns[idx][1][1] = (lns[idx][1][1] - min[1])
+                isHorizontal = lns[idx][1][0]-lns[idx][0][0] > lns[idx][1][1]-lns[idx][0][1]
+                
+                depth = lns[idx][1][0]-lns[idx][0][0] if not isHorizontal else lns[idx][1][1]-lns[idx][0][1]
+                if depth < minDepth:
+                    minDepth = depth
+            
+            scale = 30/minDepth
+
+            for idx,item in enumerate(lns):
+                lns[idx][0][0] = round(lns[idx][0][0] * scale)
+                lns[idx][0][1] = round(lns[idx][0][1] * scale)
+
+                lns[idx][1][0] = round(lns[idx][1][0] * scale)
+                lns[idx][1][1] = round(lns[idx][1][1] * scale)
+            
 
             
             all_lns.append(lns)
