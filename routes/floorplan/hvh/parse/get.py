@@ -12,7 +12,7 @@ def GET(self,dbCollection,search):
     files = glob.glob("uploaded/*.pdf")
     basefile = files[random.randint(0,len(files)-1)]
     print(basefile)
-    # basefile = "uploaded/Stratus 130.pdf"
+    basefile = "uploaded/Alto 620.pdf"
 
 
     # TODO: Handle file upload?
@@ -29,7 +29,8 @@ def GET(self,dbCollection,search):
             lines = handler.read().split("\n")
             for line in lines:
                 if re.search(r"fill:rgb\(50%,50%,50%\);",line) != None or \
-                    re.search(r"fill:rgb\(83.59375%,83.59375%,83.59375%\)",line) != None:
+                    re.search(r"fill:rgb\(83.59375%,83.59375%,83.59375%\)",line) != None or \
+                    re.search(r"fill:rgb\(67.1875%,67.1875%,67.1875%\)",line) != None:
                     dat = getMinMaxValuesBySVG(line.split(" d=\"")[1].split("\"")[0])
                     # min,max = dat
                     # lns.append({"min":min,"max":max})
@@ -92,7 +93,7 @@ def GET(self,dbCollection,search):
             "height": 391
         })
 
-    os.system(f"rm -rf uploaded/{t}")
+    # os.system(f"rm -rf uploaded/{t}")
     
     return {
         "_id": "-1",
