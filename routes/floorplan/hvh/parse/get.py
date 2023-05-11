@@ -69,7 +69,7 @@ def GET(self,dbCollection,search):
         }
 
     chosen_plan = random.randint(0,len(all_lns)-1)
-    chosen_plan = len(all_lns)
+    chosen_plan = len(all_lns)-1
     print(f"no {chosen_plan} of {len(all_lns)}")
 
     walls = []
