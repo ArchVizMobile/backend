@@ -4,7 +4,7 @@ import random
 import re
 import time
 
-from utils.hvh.parse import getMinMaxValuesBySVG
+from utils.hvh.parse import getDataByLine, getMinMaxValuesBySVG
 
 
 def GET(self,dbCollection,search):
@@ -30,8 +30,9 @@ def GET(self,dbCollection,search):
             for line in lines:
                 if re.search(r"fill:rgb\(50%,50%,50%\);",line) != None or \
                     re.search(r"fill:rgb\(83.59375%,83.59375%,83.59375%\)",line) != None or \
-                    re.search(r"fill:rgb\(67.1875%,67.1875%,67.1875%\)",line) != None:
-                    dat = getMinMaxValuesBySVG(line.split(" d=\"")[1].split("\"")[0])
+                    re.search(r"fill:rgb\(67.1875%,67.1875%,67.1875%\)",line) != None or\
+                    re.search(r"fill:rgb\(39.501953%,39.501953%,39.501953%\)",line) != None:
+                    dat = getMinMaxValuesBySVG(getDataByLine(line))
                     # min,max = dat
                     # lns.append({"min":min,"max":max})
                     lns.append(dat)
