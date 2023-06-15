@@ -2,7 +2,12 @@
 !.vscode/*.json
 *.csv
 *.jpg
+*.txt
+*.log
+*.cache
 __pycache__
 .env
 temp/
 routes/**/__init__.py
+ml/models/stairs/stairs
+.idea
