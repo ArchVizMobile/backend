@@ -27,13 +27,16 @@ def checkIntersecting(arr:List[SimplePosition],fr:int,to:int):
     return False
 
 def getData():
-    globalHeight = int(random.randrange(250,300))
-    response = APIResponse(success=False,junctions=[],walls=[])
 
     rooms = generateCorners()
 
     print(rooms)
+    return parseData(rooms)
 
+def parseData(rooms):
+    globalHeight = int(random.randrange(250,300))
+    response = APIResponse(success=False,junctions=[],walls=[])
+    
     wall_width = CONFIG.getWALL_WIDTH()
     wall_width_half = wall_width/2
 
