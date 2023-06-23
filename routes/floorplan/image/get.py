@@ -4,6 +4,8 @@ import numpy
 import sys
 import logging
 
+from data import parseData
+
 logging.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s', level=logging.DEBUG, datefmt='%I:%M:%S')
 
 # logging.debug("debug test")
@@ -474,10 +476,15 @@ def parseImage(im):
     # img.show()
 
 
-# while True:
-# screenshot = ImageGrab.grab()  # Take the screenshot
-# screenshot = screenshot.crop((0,0,screenshot.width,screenshot.height))
-# screenshot.save("screenshot.png")
-# parseImage(screenshot)
-with Image.open("screenshot.png") as im:
-    parseImage(im)
+def GET(self,dbCollection,search):
+    # while True:
+    # screenshot = ImageGrab.grab()  # Take the screenshot
+    # screenshot = screenshot.crop((0,0,screenshot.width,screenshot.height))
+    # screenshot.save("screenshot.png")
+    # parseImage(screenshot)
+    with Image.open("hand/screenshot.png") as im:
+        ret = parseImage(im)
+        # nw =  []
+        # for
+        print(ret)
+        return parseData([ret])
