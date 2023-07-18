@@ -1,9 +1,25 @@
+import dataclasses
 import json
 import logging
 from dataclasses import dataclass
+from enum import StrEnum, auto
+
 from ultralytics import YOLO
 
 from common.ModelTrainer import ModelData
+
+
+class EnhancedJSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if dataclasses.is_dataclass(o):
+            return dataclasses.asdict(o)
+        return super().default(o)
+
+
+class Classes(StrEnum):
+    STAIRS = auto()
+    ENTRY = auto()
+    ARROW = auto()
 
 
 @dataclass
@@ -17,18 +33,29 @@ class StairDetectionRequest:
 
 
 @dataclass
+class YoloResponse:
+    xmin: float
+    xmax: float
+    ymin: float
+    ymax: float
+    object: str
+
+
+@dataclass
 class StairDetectionResponse:
-    response: int
+    stair: YoloResponse = None
+    entry: YoloResponse = None
+    arrow: YoloResponse = None
 
 
 class StairService:
     def __init__(self, model_data: ModelData):
         self.model = YOLO(model_data.path)
 
-    def detect(self, request: StairDetectionRequest) -> StairDetectionResponse:
-        results = self.model.predict(request.image, save=True)
+    def detect(self, request: str) -> StairDetectionResponse:
+        results = self.model.predict(request, save=True)
 
-        detected_objects = []
+        response = StairDetectionResponse()
         for res in results:
             predictions = res.boxes.data.tolist()
             class_names = res.names
@@ -36,15 +63,21 @@ class StairService:
             for pred in predictions:
                 xmin, ymin, xmax, ymax = pred[:4]
                 detected_class = class_names[int(pred[5])]
-                obj = {
-                    'xmin': int(xmin),
-                    'ymin': int(ymin),
-                    'xmax': int(xmax),
-                    'ymax': int(ymax),
-                    'class': detected_class
-                }
-                detected_objects.append(obj)
+                obj = YoloResponse(
+                    xmin=int(xmin),
+                    ymin=int(ymin),
+                    xmax=int(xmax),
+                    ymax=int(ymax),
+                    object=detected_class
+                )
+                match detected_class:
+                    case Classes.STAIRS:
+                        response.stair = obj
+                    case Classes.ENTRY:
+                        response.entry = obj
+                    case Classes.ARROW:
+                        response.arrow = obj
 
         with open('detected_objects.json', 'w') as f:
-            json.dump(detected_objects, f)
-        return StairDetectionResponse(len(detected_objects))
+            json.dump(response, f, cls=EnhancedJSONEncoder)
+        return response

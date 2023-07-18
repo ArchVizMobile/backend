@@ -1,3 +1,4 @@
+import logging
 from collections import deque
 
 
@@ -17,21 +18,23 @@ class PipelineBuilder:
 
 
 class PipelineStep:
-    def __init__(self, services):
+    def __init__(self, *services):
         self.services = list(services)
 
     def execute(self, args):
         for service in self.services:
-            service(args)
+            service.detect(args)
 
 
 class Pipeline:
-    def __init(self):
+    def __init__(self):
         self.steps = list()
 
     def add(self, service):
-        self.steps.append(PipelineStep(service))
+        self.steps.append(service)
 
-    def execute(self, image):
-        for service in self.steps:
-            service.execute(image)
+    def execute(self, *images):
+        results = []
+        for image in images:
+            for service in self.steps:
+                results.append(service.execute(image))
