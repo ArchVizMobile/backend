@@ -6,14 +6,9 @@ from enum import StrEnum, auto
 
 from ultralytics import YOLO
 
-from common.ModelTrainer import ModelData
-
-
-class EnhancedJSONEncoder(json.JSONEncoder):
-    def default(self, o):
-        if dataclasses.is_dataclass(o):
-            return dataclasses.asdict(o)
-        return super().default(o)
+from ..common.ModelTrainer import ModelData
+from ..common.YoloResponse import YoloResponse
+from ..common.DataClassJsonEncoder import DataClassJsonEncoder
 
 
 class Classes(StrEnum):
@@ -23,22 +18,8 @@ class Classes(StrEnum):
 
 
 @dataclass
-class StairData:
-    name: str
-
-
-@dataclass
 class StairDetectionRequest:
     image: str
-
-
-@dataclass
-class YoloResponse:
-    xmin: float
-    xmax: float
-    ymin: float
-    ymax: float
-    object: str
 
 
 @dataclass
@@ -78,6 +59,6 @@ class StairService:
                     case Classes.ARROW:
                         response.arrow = obj
 
-        with open('detected_objects.json', 'w') as f:
-            json.dump(response, f, cls=EnhancedJSONEncoder)
+        with open('detected_objects_stairs.json', 'w') as f:
+            json.dump(response, f, cls=DataClassJsonEncoder)
         return response
