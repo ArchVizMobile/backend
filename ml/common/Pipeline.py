@@ -41,7 +41,6 @@ class Pipeline:
         for image in images:
             floor = {}
             for service in self.steps:
-                logging.info("test")
                 floor[service.model] = service.execute(image)
         floors.append(floor)
         return jsonpickle.encode(floors, unpicklable=False)
