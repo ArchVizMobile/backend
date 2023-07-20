@@ -32,9 +32,10 @@ class StairDetectionResponse:
 class StairService:
     def __init__(self, model_data: ModelData):
         self.model = YOLO(model_data.path)
+        self.model_data = model_data
 
     def detect(self, request: str) -> StairDetectionResponse:
-        results = self.model.predict(request, save=True)
+        results = self.model.predict(request, save=False)
 
         response = StairDetectionResponse()
         for res in results:

@@ -1,5 +1,8 @@
+import json
 import logging
 from collections import deque
+
+import jsonpickle
 
 
 class PipelineBuilder:
@@ -18,12 +21,12 @@ class PipelineBuilder:
 
 
 class PipelineStep:
-    def __init__(self, *services):
-        self.services = list(services)
+    def __init__(self, service):
+        self.model = service.model_data.model
+        self.service = service
 
     def execute(self, args):
-        for service in self.services:
-            service.detect(args)
+        return self.service.detect(args)
 
 
 class Pipeline:
@@ -34,7 +37,11 @@ class Pipeline:
         self.steps.append(service)
 
     def execute(self, *images):
-        results = []
+        floors = []
         for image in images:
+            floor = {}
             for service in self.steps:
-                results.append(service.execute(image))
+                logging.info("test")
+                floor[service.model] = service.execute(image)
+        floors.append(floor)
+        return jsonpickle.encode(floors, unpicklable=False)
