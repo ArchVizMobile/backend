@@ -180,6 +180,7 @@ class Server(BaseHTTPRequestHandler):
 
 def run(server_class=HTTPServer, handler_class=Server, port=CONFIG.getSERVER_PORT()):
     server_address = (CONFIG.getWEB_HOST(), CONFIG.getWEB_PORT())
+    print(f"Server listening on http://{server_address[0]}:{server_address[1]}")
     httpd = server_class(server_address, handler_class)
 
     httpd.serve_forever()
