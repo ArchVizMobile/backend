@@ -1,4 +1,5 @@
 from datetime import date
+import glob
 from http.server import BaseHTTPRequestHandler,HTTPServer
 import io
 import os
@@ -179,6 +180,7 @@ class Server(BaseHTTPRequestHandler):
 
 def run(server_class=HTTPServer, handler_class=Server, port=CONFIG.getSERVER_PORT()):
     server_address = (CONFIG.getWEB_HOST(), CONFIG.getWEB_PORT())
+    print(f"Server listening on http://{server_address[0]}:{server_address[1]}")
     httpd = server_class(server_address, handler_class)
 
     httpd.serve_forever()
@@ -186,6 +188,13 @@ def run(server_class=HTTPServer, handler_class=Server, port=CONFIG.getSERVER_POR
 if __name__ == "__main__":
     from sys import argv
     # getData()
+
+    dir = glob.glob("uploaded/*")
+    for item in dir:
+        t = item.split(".")
+        if len(t)<=1:
+            os.system(f"rm -rf {item}")
+
     if len(argv) == 2:
         run(port=int(argv[1]))
     else:
