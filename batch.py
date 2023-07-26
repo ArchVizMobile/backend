@@ -115,20 +115,10 @@ class Timer:
         end = time.time()
         return (f"Took ~{round(end-self.start)}s")
 
-# def MakeWallsFromFloorplans(floorplans:List[Floorplan]):
-#     for plan in floorplans:
-#         for line in plan.svg:
-#         print(plan)
 
 generate_timer = Timer()
 floorplans,svgs,pngs = GenerateFloorplans("uploaded/Calvus 631.pdf")
 print(generate_timer)
-# print(floorplans,svgs,pngs)
-
-# parse_timer = Timer()
-
-# start = time.time()
-
 
 for plan in floorplans:
     print(plan.walls)
