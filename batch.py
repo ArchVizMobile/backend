@@ -5,6 +5,7 @@ from typing import List
 from PIL import Image, ImageChops
 
 from routes.floorplan.hvh.parse.get import Color, getFooter, getHeaderBar
+from runPipeline import runPipeline
 from utils.hvh.parse import MinMaxValue, Point, Wall, getAttributeDataFromSvg, getDataByLine, getWallInformationBySVG
 
 header_bar = Color("87.889099%,92.576599%,96.484375%")
@@ -122,5 +123,11 @@ generate_timer = Timer()
 floorplans,svgs,pngs = GenerateFloorplans("uploaded/Calvus 631.pdf")
 print(generate_timer)
 
-for plan in floorplans:
-    print(plan.walls)
+images = [plan.image for plan in floorplans]
+
+out = runPipeline(images)
+print(out)
+
+# for plan in floorplans:
+    # plan.image
+    # print(plan.walls)
