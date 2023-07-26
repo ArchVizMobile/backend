@@ -1,19 +1,11 @@
 import glob
 import os
-import re
 import time
 from typing import List
+from PIL import Image, ImageChops
 
 from routes.floorplan.hvh.parse.get import Color, getFooter, getHeaderBar
-from utils.hvh.parse import MinMaxValue, getAttributeDataFromSvg, getDataByLine, getWallInformationBySVG
-
-def createSVGs():
-    for idx,file in enumerate(glob.glob(f"uploaded/*.pdf")):
-        baseName = file.split(".")[0].split("/")[1]
-        os.system(f'mkdir "uploaded/{baseName}" && pdf2svg "{file}" "uploaded/{baseName}/%d.svg" all')
-        for svgidx,svg in enumerate(glob.glob(f"uploaded/{baseName}/*.svg")):
-            print(svg)
-            os.system(f"convert -density 1000 \"{svg}\" \"uploaded/{baseName}/{svgidx+1}.png\"")
+from utils.hvh.parse import MinMaxValue, Point, Wall, getAttributeDataFromSvg, getDataByLine, getWallInformationBySVG
 
 header_bar = Color("87.889099%,92.576599%,96.484375%")
 outer_wall = Color("83.59375%,83.59375%,83.59375%")
@@ -23,64 +15,31 @@ table_heading = Color("88.28125%,88.28125%,88.28125%")
 entry = Color("39.501953%,39.501953%,39.501953%")
 footerHeightOffset = 10
 
+IMAGE_SCALE_FACTOR = 4
 
-def analyzeSVG(baseName:str):
-    linez = []
+class Floorplan:
+    def __init__(self,
+            image:str,
+            svg:List[str],
+            bbox:tuple[int, int, int, int],
+            header:MinMaxValue,
+            height:float,
+            maxHeight:int) -> None:
+        self.image = image
+        self.svg = svg
+        self.bbox = bbox
+        self.header = header
+        self.height = height
+        self.maxHeight = maxHeight
+        self.walls:List[Wall] = []
 
-    cache:List[MinMaxValue] = []
+        for line in svg:
+            wall = getWallInformationBySVG(line)
+            if wall!=None:
+                self.walls.append(wall)
 
-    with open(baseName) as handler:
-        newBaseName = baseName.replace(".svg",".corrected.svg")
-        correctedSvg = open(newBaseName, "w")
-
-        svg = handler.read().split("\n")
-
-        header = getHeaderBar(svg)
-
-        # Get SVG Height & check max available height
-        decl = svg[1].split(" ")
-        height = 842
-        for item in decl:
-            if item.startswith("height"):
-                height = int(item.split("\"")[1].removesuffix("pt"))
-        maxHeight = height - 30
-        footer = getFooter(svg)
-        if footer!=None:
-            maxHeight = footer.y.min
-
-
-        if header != None:
-            for line in svg:
-                data = getWallInformationBySVG(getDataByLine(line),line)
-                if data!=None and data.y.min >= header.y.max and data.y.max <= maxHeight and ( inner_wall.check(line) or  outer_wall.check(line)):
-                    linez.append([line,data])
-                    cache.append(data)
-
-        correctedSvg.write(svg[0]+"\n")
-        correctedSvg.write(svg[1]+"\n")
-
-        for line,data in linez:
-            if line.startswith("<path"):
-                style = line.split("style=\"")[1].split("\"")[0]
-                d = line.split("d=\"")[1].split("\"")[0]
-                line = line.replace(d,data.getCorrected())
-                try:
-                    transform = line.split("transform=\"")[1].split("\"")[0]
-                    line = line.replace(transform,"")
-                except:
-                    pass
-                correctedSvg.write(line+"\n")
-            else:
-                correctedSvg.write(line+"\n")
-        correctedSvg.write(svg[len(svg)-2]+"\n")
-        correctedSvg.close()
-    return linez
-
-# baseName = "uploaded/Calvus 620/4.svg"
-# linez = analyzeSVG(baseName)
-# print(linez)
-
-IMAGE_SCALE_FACTOR = 10
+    def __repr__(self) -> str:
+        return f"Floorplan({self.image})"
 
 def generateSVGs(file:str):
     baseName = file.split(".")[0].split("/")[1]
@@ -93,45 +52,83 @@ def generateSVGs(file:str):
         os.system(f"convert -density {100*IMAGE_SCALE_FACTOR} \"{svg}\" \"uploaded/{baseName}/{svgidx+1}.png\"")
     return svgs,[f.replace(".svg",".png") for f in svgs]
 
-# svgs,pngs = generateSVGs("uploaded/Calvus 631.pdf")
-svgs = ['uploaded/Calvus 631/1.svg', 'uploaded/Calvus 631/2.svg', 'uploaded/Calvus 631/3.svg', 'uploaded/Calvus 631/4.svg', 'uploaded/Calvus 631/5.svg']
-pngs = ['uploaded/Calvus 631/1.png', 'uploaded/Calvus 631/2.png', 'uploaded/Calvus 631/3.png', 'uploaded/Calvus 631/4.png', 'uploaded/Calvus 631/5.png']
-# print(svgs)
-# print(pngs)
+def trim(im):
+    bg = Image.new(im.mode, im.size, im.getpixel((0,0)))
+    diff = ImageChops.difference(im, bg)
+    diff = ImageChops.add(diff, diff, 2.0, -100)
+    bbox = diff.getbbox()
+    if bbox:
+        return im.crop(bbox),bbox
+    else: 
+        # Failed to find the borders, convert to "RGB"        
+        return trim(im.convert('RGB'))
 
-floorplans = []
+def GenerateFloorplans(pdf:str):
+    svgs,pngs = generateSVGs(pdf)
 
-for idx,svg in enumerate(svgs):
-    print(f"Checking {svg}")
-    with open(svg) as file_handler:
-        lines = file_handler.read().split("\n")
+    floorplans:List[Floorplan] = []
 
-        found = 0
-        for line in lines:
-            if inner_wall.check(line) or outer_wall.check(line):
-                found = found + 1
+    for idx,svg in enumerate(svgs):
+        with open(svg) as file_handler:
+            lines = file_handler.read().split("\n")
 
-        print(found)
+            found = 0
+            for line in lines:
+                if inner_wall.check(line) or outer_wall.check(line):
+                    found = found + 1
 
-        if found > 10:
-            header = getHeaderBar(lines)
+            if found > 1 and idx>2:
+                header = getHeaderBar(lines)
 
-            height = 842
-            try:
-                height = float(getAttributeDataFromSvg(lines[1],"height").removesuffix("pt"))
-            except:
-                pass
+                height = 842.
+                try:
+                    height = float(getAttributeDataFromSvg(lines[1],"height").removesuffix("pt"))
+                except:
+                    pass
 
-            maxHeight = height - 30
-            footer = getFooter(lines)
-            if footer!=None:
-                maxHeight = footer.y.min
+                maxHeight = height - 30
+                footer = getFooter(lines)
+                if footer!=None:
+                    maxHeight = footer.y.min
 
-            print(f"{idx+1}.svg | maxHeight={maxHeight} header.y.max={header.y.max}")
+                im = Image.open(pngs[idx])
+                im1 = im.crop((
+                    0,  #left
+                    (header.y.max+IMAGE_SCALE_FACTOR)*IMAGE_SCALE_FACTOR, #top
+                    im.width, #right
+                    maxHeight*IMAGE_SCALE_FACTOR #bottom
+                ))
+                im1,bbox = trim(im1)
+                newFile = pngs[idx].replace(".png",".2.png")
+                im1.save(newFile)
+                # print(f"{idx+1}.svg | maxHeight={maxHeight} header.y.max={header.y.max}")
+                floorplans.append(Floorplan(newFile,lines,bbox,header,height,maxHeight))
 
-            # for line in lines:
-            #     data = getWallInformationBySVG(line)
-            #     if data!=None and data.min.y >= header.y.max and data.max.y <= maxHeight and ( inner_wall.check(line) or  outer_wall.check(line)):
-            #         floorplans.append({
-            #             "lines":lines
-            #         })
+    return floorplans,svgs,pngs
+
+class Timer:
+    def __init__(self) -> None:
+        self.start = time.time()
+        pass
+
+    def __str__(self):
+        end = time.time()
+        return (f"Took ~{round(end-self.start)}s")
+
+# def MakeWallsFromFloorplans(floorplans:List[Floorplan]):
+#     for plan in floorplans:
+#         for line in plan.svg:
+#         print(plan)
+
+generate_timer = Timer()
+floorplans,svgs,pngs = GenerateFloorplans("uploaded/Calvus 631.pdf")
+print(generate_timer)
+# print(floorplans,svgs,pngs)
+
+# parse_timer = Timer()
+
+# start = time.time()
+
+
+for plan in floorplans:
+    print(plan.walls)

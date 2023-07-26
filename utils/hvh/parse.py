@@ -266,16 +266,18 @@ def getWallInformationBySVG(raw:str):
         return None
     
     boxes = []
+    try:
+        for box in data.split(" Z "):
+            points = []
 
-    for box in data.split(" Z "):
-        points = []
-
-        for pts in box.split("M ")[1].split(" L "):
-            p = pts.split(" ")
-            points.append(Point(float(p[0]),float(p[1])))
-        boxes.append(Box(points))
-    wall = Wall(boxes)
-    return wall
+            for pts in box.split("M ")[1].split(" L "):
+                p = pts.split(" ")
+                points.append(Point(float(p[0]),float(p[1])))
+            boxes.append(Box(points))
+        wall = Wall(boxes)
+        return wall
+    except:
+        return None
 
 # https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform
 def getMatrixFromString(matrix:str):
