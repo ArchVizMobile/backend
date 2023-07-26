@@ -9,6 +9,7 @@ from enum import StrEnum, auto
 
 class Models(StrEnum):
     STAIRS = auto()
+    WALLFEATURES = auto()
 
 
 @dataclass
