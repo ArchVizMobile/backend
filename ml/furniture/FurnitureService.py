@@ -142,6 +142,6 @@ class FurnitureService:
                             response.wc = []
                         response.wc.append(obj)
 
-        with open('detected_objects_Furniture.json', 'w') as f:
-            json.dump(response, f, cls=DataClassJsonEncoder)
+        # with open('detected_objects_Furniture.json', 'w') as f:
+        #     json.dump(response, f, cls=DataClassJsonEncoder)
         return response

@@ -39,7 +39,7 @@ class WallFeatureService:
         self.model_data = model_data
 
     def detect(self, request: str) -> WallFeatureDetectionResponse:
-        results = self.model.predict(request, save=False)
+        results = self.model.predict(request, save=False, conf=0.5)
 
         response = WallFeatureDetectionResponse()
         for res in results:
@@ -78,6 +78,6 @@ class WallFeatureService:
                             response.roofWindow = []
                         response.roofWindow.append(obj)
 
-        with open('detected_objects_wallfeatures.json', 'w') as f:
-            json.dump(response, f, cls=DataClassJsonEncoder)
+        # with open('detected_objects_wallfeatures.json', 'w') as f:
+        #     json.dump(response, f, cls=DataClassJsonEncoder)
         return response
