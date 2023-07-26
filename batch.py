@@ -44,12 +44,15 @@ class Floorplan:
 def generateSVGs(file:str):
     baseName = file.split(".")[0].split("/")[1]
     print(f"[{baseName}] Parsing SVGs from PDF")
-    os.system(f'mkdir "uploaded/{baseName}" && pdf2svg "{file}" "uploaded/{baseName}/%d.svg" all')
+    os.system(f'mkdir "uploaded/{baseName}"')
+    os.system(f'pdf2svg\dist-64bits\pdf2svg.exe "{file}" "uploaded/{baseName}/%d.svg" all')
     svgs = glob.glob(f"uploaded/{baseName}/*.svg")
     print(f"[{baseName}] Creating Images from SVGs")
     for svgidx,svg in enumerate(svgs):
         print(f"[{baseName}] {svgidx+1}/{len(svgs)}")
-        os.system(f"convert -density {100*IMAGE_SCALE_FACTOR} \"{svg}\" \"uploaded/{baseName}/{svgidx+1}.png\"")
+        cmd = f'ImageMagick\convert.exe -density {100*IMAGE_SCALE_FACTOR} "{svg}" "uploaded/{baseName}/{svgidx+1}.png"'
+        print(cmd)
+        os.system(cmd)
     return svgs,[f.replace(".svg",".png") for f in svgs]
 
 def trim(im):
@@ -114,7 +117,6 @@ class Timer:
     def __str__(self):
         end = time.time()
         return (f"Took ~{round(end-self.start)}s")
-
 
 generate_timer = Timer()
 floorplans,svgs,pngs = GenerateFloorplans("uploaded/Calvus 631.pdf")

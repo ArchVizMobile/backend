@@ -88,3 +88,9 @@ Beispiel für einen Floorplan response:
   "scale": 1.5
 }
 ```
+
+# Installation
+
+```bash
+conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
+```

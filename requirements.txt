@@ -1,4 +1,6 @@
-numpy~=1.24.3
-Pillow~=9.5.0
-python-dotenv~=0.21.0
-ultralytics~=8.0.107
+jsonpickle==3.0.1
+numpy==1.25.1
+Pillow==10.0.0
+pymongo==4.4.1
+python-dotenv==1.0.0
+ultralytics==8.0.142
