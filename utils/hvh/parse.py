@@ -246,15 +246,14 @@ class Wall:
                 or box1.fr.y > gap.to.y
                 or box1.to.y < gap.fr.y)
             if x:
-                return True,gap
-        return False,None
+                return gap
+        return None
     
     def addDoor(self,door:Door)->None:
         self.doors.append(door)
-        pass
 
-    def addWindow(self,window:Window,gapIdx:int)->None:
-        pass
+    def addWindow(self,window:Window)->None:
+        self.windows.append(window)
 
     def __repr__(self) -> str:
         return f"Wall(Position(from: x={self.min.x}, y={self.min.y} | to: x={self.max.x}, y={self.max.y}) | horizontal={self.isHorizontal} | doors={len(self.doors)} | windows={len(self.windows)})" #  {self.gaps}
