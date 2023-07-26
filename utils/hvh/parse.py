@@ -29,7 +29,19 @@ class MinMaxValue:
     
     def __str__(self):
         return "[MinMaxValue] " + str(self.toDict())
+    
+    def inRange(self,item:"MinMaxValue",offset=10):
+        box1 = [[self.x.min-offset,self.y.min-offset],[self.x.min+offset,self.y.min+offset]]
+        box2 = [[item.x.min-offset,item.y.min-offset],[item.x.min+offset,item.y.min+offset]]
 
+        return not (box1[0][0] > box2[1][0]
+                    or box1[1][0] < box2[0][0]
+                    or box1[0][1] > box2[1][1]
+                    or box1[1][1] < box2[0][1])
+        # return not (self.top_right.x < other.bottom_left.x
+        #             or self.bottom_left.x > other.top_right.x
+        #             or self.top_right.y < other.bottom_left.y
+        #             or self.bottom_left.y > other.top_right.y)
 
 def getMinMaxValuesBySVG(d:List[str]):
     if d==None:
@@ -95,7 +107,7 @@ def getDataByLine(line:str):
         return None
 
 if __name__=="__main__":
-    line = '<path xmlns="http://www.w3.org/2000/svg" style="fill:none;stroke-width:3.996;stroke-linecap:round;stroke-linejoin:round;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 1421.560211 -5282.957511 L 1443.543436 -5282.957511 L 1465.526661 -5286.965429 L 1487.509886 -5292.961014 L 1507.476898 -5298.989184 L 1527.47643 -5308.992687 L 1545.459749 -5320.983857 L 1563.443067 -5333.007611 L 1579.410173 -5349.039284 L 1593.393586 -5363.050705 L 1607.376998 -5381.070045 L 1617.393024 -5399.089384 L 1627.37653 -5419.09639 L 1635.343823 -5439.135981 L 1641.359942 -5461.130654 L 1643.343636 -5483.157912 L 1645.359848 -5507.172836 " transform="matrix(0.12012,0,0,0.11988,0,842)"/>'
+    line = '<path style="fill:none;stroke-width:3.996;stroke-linecap:round;stroke-linejoin:round;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 1743.243735 -4062.725643 L 1885.094073 -4062.725643 " transform="matrix(0.12012,0,0,0.11988,0,842)"/>'
     print(line)
     data = getDataByLine(line)
     print(data)
