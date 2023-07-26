@@ -1,2 +1,2 @@
 def GET(self,dbCollection,search):
-    return self.path
+    return {"path":self.path}
