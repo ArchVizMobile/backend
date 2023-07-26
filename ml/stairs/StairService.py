@@ -35,7 +35,7 @@ class StairService:
         self.model_data = model_data
 
     def detect(self, request: str) -> StairDetectionResponse:
-        results = self.model.predict(request, save=False)
+        results = self.model.predict(request, save=True, conf=0.5)
 
         response = StairDetectionResponse()
         for res in results:
