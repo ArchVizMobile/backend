@@ -19,7 +19,7 @@ class Color:
         self.color = color
 
     def check(self,line:str):
-        return re.search(r"fill:rgb\("+self.color+"\)",line)!=None
+        return re.search(r"rgb\("+self.color+"\)",line)!=None
 
 header_bar = Color("87.889099%,92.576599%,96.484375%")
 outer_wall = Color("83.59375%,83.59375%,83.59375%")
