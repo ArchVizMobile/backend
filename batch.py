@@ -5,7 +5,8 @@ from typing import List
 from PIL import Image, ImageChops
 
 from routes.floorplan.hvh.parse.get import Color, getFooter, getHeaderBar
-from utils.hvh.parse import MinMaxValue, Point, Wall, getAttributeDataFromSvg, getDataByLine, getWallInformationBySVG
+from runPipeline import runPipeline
+from utils.hvh.parse import Door, MinMaxValue, Point, Point3D, Wall, Window, getAttributeDataFromSvg, getDataByLine, getWallInformationBySVG
 
 header_bar = Color("87.889099%,92.576599%,96.484375%")
 outer_wall = Color("83.59375%,83.59375%,83.59375%")
@@ -17,6 +18,12 @@ footerHeightOffset = 10
 
 IMAGE_SCALE_FACTOR = 4
 
+class Furniture:
+    def __init__(self,fr:Point,to:Point,obj:str) -> None:
+        self.fr = fr
+        self.to = to
+        self.obj = obj
+
 class Floorplan:
     def __init__(self,
             image:str,
@@ -24,14 +31,17 @@ class Floorplan:
             bbox:tuple[int, int, int, int],
             header:MinMaxValue,
             height:float,
+            width:float,
             maxHeight:int) -> None:
         self.image = image
         self.svg = svg
         self.bbox = bbox
         self.header = header
         self.height = height
+        self.width = width
         self.maxHeight = maxHeight
         self.walls:List[Wall] = []
+        self.furniture:List[Furniture] = []
 
         for line in svg:
             wall = getWallInformationBySVG(line)
@@ -40,16 +50,25 @@ class Floorplan:
 
     def __repr__(self) -> str:
         return f"Floorplan({self.image})"
+    
+    def addFurniture(self,furniture:Furniture):
+        self.furniture.append(furniture)
 
 def generateSVGs(file:str):
     baseName = file.split(".")[0].split("/")[1]
     print(f"[{baseName}] Parsing SVGs from PDF")
-    os.system(f'mkdir "uploaded/{baseName}" && pdf2svg "{file}" "uploaded/{baseName}/%d.svg" all')
+    os.system(f'mkdir "uploaded/{baseName}"')
+    os.system(f'pdf2svg\dist-64bits\pdf2svg.exe "{file}" "uploaded/{baseName}/%d.svg" all')
     svgs = glob.glob(f"uploaded/{baseName}/*.svg")
     print(f"[{baseName}] Creating Images from SVGs")
     for svgidx,svg in enumerate(svgs):
-        print(f"[{baseName}] {svgidx+1}/{len(svgs)}")
-        os.system(f"convert -density {100*IMAGE_SCALE_FACTOR} \"{svg}\" \"uploaded/{baseName}/{svgidx+1}.png\"")
+        with open(svg) as file_handle:
+            lines = file_handle.read().split("\n")
+            width = getAttributeDataFromSvg(lines[1],"width").removesuffix("pt")
+            print(f"[{baseName}] {svgidx+1}/{len(svgs)}")
+            cmd = f'ImageMagick\convert.exe -size {float(width)*IMAGE_SCALE_FACTOR} "{svg}" "uploaded/{baseName}/{svgidx+1}.png"'
+            # print(cmd)
+            os.system(cmd)
     return svgs,[f.replace(".svg",".png") for f in svgs]
 
 def trim(im):
@@ -85,6 +104,11 @@ def GenerateFloorplans(pdf:str):
                     height = float(getAttributeDataFromSvg(lines[1],"height").removesuffix("pt"))
                 except:
                     pass
+                width = 595.
+                try:
+                    width = float(getAttributeDataFromSvg(lines[1],"width").removesuffix("pt"))
+                except:
+                    pass
 
                 maxHeight = height - 30
                 footer = getFooter(lines)
@@ -102,7 +126,7 @@ def GenerateFloorplans(pdf:str):
                 newFile = pngs[idx].replace(".png",".2.png")
                 im1.save(newFile)
                 # print(f"{idx+1}.svg | maxHeight={maxHeight} header.y.max={header.y.max}")
-                floorplans.append(Floorplan(newFile,lines,bbox,header,height,maxHeight))
+                floorplans.append(Floorplan(newFile,lines,bbox,header,height,width,maxHeight))
 
     return floorplans,svgs,pngs
 
@@ -115,10 +139,212 @@ class Timer:
         end = time.time()
         return (f"Took ~{round(end-self.start)}s")
 
-
 generate_timer = Timer()
 floorplans,svgs,pngs = GenerateFloorplans("uploaded/Calvus 631.pdf")
-print(generate_timer)
+print(generate_timer) # ~9s
 
+images = [plan.image for plan in floorplans]
+# images = ['uploaded/Calvus 631\\4.2.png', 'uploaded/Calvus 631\\5.2.png']
+# print(images)
+
+detect_timer = Timer()
+
+out = runPipeline(images)
+
+def getPointsByItem(item):
+    return Point(item.xmin,item.ymin),Point(item.xmax,item.ymax),item.object
+
+for idx,floor in enumerate(out):
+    # print(f"stairs={floor['stairs']}\n")
+    print(f"wallfeatures={floor['wallfeatures']}\n")
+    print(f"wallfeatures.window={floor['wallfeatures'].window}\n")
+    # print(f"furniture={floor['furniture']}\n")
+
+    if floor['wallfeatures'].window!=None:
+        for window in floor['wallfeatures'].window:
+            for wall in floorplans[idx].walls:
+                fr,to,obj = getPointsByItem(window)
+                gap = wall.hasGap(fr,to)
+                if gap!=None:
+                    wall.addWindow(Window(gap.fr,gap.to,obj))
+
+    if floor['wallfeatures'].door!=None:
+        for door in floor['wallfeatures'].door:
+            for wall in floorplans[idx].walls:
+                fr,to,obj = getPointsByItem(window)
+                gap = wall.hasGap(fr,to)
+                if gap!=None:
+                    wall.addDoor(Door(gap.fr,gap.to,obj))
+
+    if floor['wallfeatures'].doubleDoor!=None:
+        for door in floor['wallfeatures'].doubleDoor:
+            for wall in floorplans[idx].walls:
+                fr,to,obj = getPointsByItem(window)
+                gap = wall.hasGap(fr,to)
+                if gap!=None:
+                    wall.addDoor(Door(gap.fr,gap.to,obj))
+
+    # Furniture
+
+    if floor['furniture'].armchair!=None:
+        for furniture in floor['furniture'].armchair:
+            fr,to,obj = getPointsByItem(furniture)
+            floorplans[idx].addFurniture(Furniture(fr,to,obj))
+
+    if floor['furniture'].bathtub!=None:
+        for furniture in floor['furniture'].bathtub:
+            fr,to,obj = getPointsByItem(furniture)
+            floorplans[idx].addFurniture(Furniture(fr,to,obj))
+
+    if floor['furniture'].bed!=None:
+        for furniture in floor['furniture'].bed:
+            fr,to,obj = getPointsByItem(furniture)
+            floorplans[idx].addFurniture(Furniture(fr,to,obj))
+
+    if floor['furniture'].couch!=None:
+        for furniture in floor['furniture'].couch:
+            fr,to,obj = getPointsByItem(furniture)
+            floorplans[idx].addFurniture(Furniture(fr,to,obj))
+
+    if floor['furniture'].desk!=None:
+        for furniture in floor['furniture'].desk:
+            fr,to,obj = getPointsByItem(furniture)
+            floorplans[idx].addFurniture(Furniture(fr,to,obj))
+
+    if floor['furniture'].dining_table_4_chairs!=None:
+        for furniture in floor['furniture'].dining_table_4_chairs:
+            fr,to,obj = getPointsByItem(furniture)
+            floorplans[idx].addFurniture(Furniture(fr,to,obj))
+
+    if floor['furniture'].dining_table_6_chairs!=None:
+        for furniture in floor['furniture'].dining_table_6_chairs:
+            fr,to,obj = getPointsByItem(furniture)
+            floorplans[idx].addFurniture(Furniture(fr,to,obj))
+
+    if floor['furniture'].kitchenette!=None:
+        for furniture in floor['furniture'].kitchenette:
+            fr,to,obj = getPointsByItem(furniture)
+            floorplans[idx].addFurniture(Furniture(fr,to,obj))
+
+    if floor['furniture'].lowboardTV!=None:
+        for furniture in floor['furniture'].lowboardTV:
+            fr,to,obj = getPointsByItem(furniture)
+            floorplans[idx].addFurniture(Furniture(fr,to,obj))
+
+    if floor['furniture'].masterbed!=None:
+        for furniture in floor['furniture'].masterbed:
+            fr,to,obj = getPointsByItem(furniture)
+            floorplans[idx].addFurniture(Furniture(fr,to,obj))
+
+    if floor['furniture'].shelf!=None:
+        for furniture in floor['furniture'].shelf:
+            fr,to,obj = getPointsByItem(furniture)
+            floorplans[idx].addFurniture(Furniture(fr,to,obj))
+
+    if floor['furniture'].shower!=None:
+        for furniture in floor['furniture'].shower:
+            fr,to,obj = getPointsByItem(furniture)
+            floorplans[idx].addFurniture(Furniture(fr,to,obj))
+
+    if floor['furniture'].sink!=None:
+        for furniture in floor['furniture'].sink:
+            fr,to,obj = getPointsByItem(furniture)
+            floorplans[idx].addFurniture(Furniture(fr,to,obj))
+
+    if floor['furniture'].table!=None:
+        for furniture in floor['furniture'].table:
+            fr,to,obj = getPointsByItem(furniture)
+            floorplans[idx].addFurniture(Furniture(fr,to,obj))
+
+    if floor['furniture'].wc!=None:
+        for furniture in floor['furniture'].wc:
+            fr,to,obj = getPointsByItem(furniture)
+            floorplans[idx].addFurniture(Furniture(fr,to,obj))
+
+print(detect_timer)
+f = {
+    "fromPosition": {
+        "x": 150,
+        "y": 150
+    },
+    "toPosition": {
+        "x": 840,
+        "y": 150
+    },
+    "isHorizontal": True,
+    "isOuterWall": True,
+    "features": [
+        {
+            "fromPosition": 60,
+            "toPosition": 180,
+            "hinge": -1,
+            "openLeft": False,
+            "style": "default",
+            "z": 178,
+            "height": 127,
+            "type": "WINDOW"
+        },
+        {
+            "fromPosition": 360,
+            "toPosition": 483,
+            "hinge": -1,
+            "openLeft": False,
+            "style": "default",
+            "z": 178,
+            "height": 127,
+            "type": "WINDOW"
+        }
+    ],
+    "depth": 30,
+    "height": 435
+}
+
+response = {
+  "success": True,
+  "name": "LELE ROFL",
+  "walls": [],
+  "junctions": [],
+  "rooms": [],
+  "scale": -1,
+  "_id": "",
+}
 for plan in floorplans:
-    print(plan.walls)
+    for wall in plan.walls:
+        w = {
+            "fromPosition": {
+                "x": wall.min.x,
+                "y": wall.min.y
+            },
+            "toPosition": {
+                "x": wall.min.x if wall.isHorizontal else wall.max.x,
+                "y": wall.max.y if wall.isHorizontal else wall.min.y
+            },
+            "isHorizontal": wall.isHorizontal,
+            "isOuterWall": False,
+            "features": [
+                
+            ],
+            "depth": 30,
+            "height": 435
+        }
+        for feature in wall.doors:
+            w["features"].append({
+                "fromPosition": 60,
+                "toPosition": 180,
+                "hinge": -1,
+                "openLeft": False,
+                "style": "default",
+                "z": 178,
+                "height": 127,
+                "type": "WINDOW"
+            })
+        #         {
+        #             "fromPosition": 360,
+        #             "toPosition": 483,
+        #             "hinge": -1,
+        #             "openLeft": False,
+        #             "style": "default",
+        #             "z": 178,
+        #             "height": 127,
+        #             "type": "WINDOW"
+        #         }

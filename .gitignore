@@ -16,3 +16,5 @@ pdf2svg/*
 
 ml/models/stairs/stairs
 .idea
+ImageMagick/*
+pdf2svg/*

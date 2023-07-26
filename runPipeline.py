@@ -17,7 +17,7 @@ logging.basicConfig(
 )
 
 # takes an array of paths to images
-def run( paths: List[str]):
+def runPipeline( paths: List[str]):
     trainer = ModelTrainer()
     stair_model = trainer.load(Models.STAIRS)
     wallfeatures_model = trainer.load(Models.WALLFEATURES)
