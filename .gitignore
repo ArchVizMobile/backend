@@ -2,9 +2,15 @@
 !.vscode/*.json
 *.csv
 *.jpg
+*.txt
+*.log
+*.cache
 __pycache__
 .env
 temp/
 routes/**/__init__.py
 uploaded/
 *.md
+
+ml/models/stairs/stairs
+.idea
