@@ -30,16 +30,17 @@ entry = Color("39.501953%,39.501953%,39.501953%")
 footerHeightOffset = 10
 
 def getHeaderBar(svgLines:List[str]):
+    print(svgLines)
     for line in svgLines:
         if header_bar.check(line):
-            return getMinMaxValuesBySVG(getDataByLine(line))
+            return getMinMaxValuesBySVG(getDataByLine(line),line)
     return None
 
 def getFooter(svgLines:List[str]):
     found:List[MinMaxValue] = []
     for line in svgLines:
         if input_field.check(line) or table_heading.check(line):
-            temp = getMinMaxValuesBySVG(getDataByLine(line))
+            temp = getMinMaxValuesBySVG(getDataByLine(line),line)
             if temp!=None:
                 found.append(temp)
         
@@ -56,7 +57,7 @@ def getFooter(svgLines:List[str]):
 def getWalls(svgLines:List[str]):
     lines = []
     for line in svgLines:
-        dat = getMinMaxValuesBySVG(getDataByLine(line))
+        dat = getMinMaxValuesBySVG(getDataByLine(line),line)
 
         if re.search(r"fill:rgb(87.889099%,92.576599%,96.484375%);",line) != None:
             print("asd"+line)
@@ -90,7 +91,7 @@ def getMinMaxValuesBySVGFromXAndY(line:str):
 def removeDeadZones(svg:List[str],header:MinMaxValue,height:int=0,footer:MinMaxValue=None):
     lines:List[DeadZonedLines] = []
     for line in svg:
-        dat = getMinMaxValuesBySVG(getDataByLine(line))
+        dat = getMinMaxValuesBySVG(getDataByLine(line),line)
         # lines.append(DeadZonedLines(dat,line))
         if dat==None:
             dat = getMinMaxValuesBySVGFromXAndY(line)
