@@ -35,7 +35,7 @@ class StairService:
         self.model_data = model_data
 
     def detect(self, request: str) -> StairDetectionResponse:
-        results = self.model.predict(request, save=True, conf=0.5)
+        results = self.model.predict(request, save=False, conf=0.5)
 
         response = StairDetectionResponse()
         for res in results:
@@ -60,6 +60,6 @@ class StairService:
                     case Classes.ARROW:
                         response.arrow = obj
 
-        with open('detected_objects_stairs.json', 'w') as f:
-            json.dump(response, f, cls=DataClassJsonEncoder)
+        # with open('detected_objects_stairs.json', 'w') as f:
+        #     json.dump(response, f, cls=DataClassJsonEncoder)
         return response

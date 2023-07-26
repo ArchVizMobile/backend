@@ -99,6 +99,7 @@ pngs = ['uploaded/Calvus 631/1.png', 'uploaded/Calvus 631/2.png', 'uploaded/Calv
 # print(svgs)
 # print(pngs)
 
+
 floorplans = []
 
 for idx,svg in enumerate(svgs):
