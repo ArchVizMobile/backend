@@ -101,30 +101,37 @@ pngs = ['uploaded/Calvus 631/1.png', 'uploaded/Calvus 631/2.png', 'uploaded/Calv
 
 floorplans = []
 
-for svg in svgs:
+for idx,svg in enumerate(svgs):
+    print(f"Checking {svg}")
     with open(svg) as file_handler:
         lines = file_handler.read().split("\n")
-        # print(lines)
-        header = getHeaderBar(lines)
 
-        height = 842
-        try:
-            height = float(getAttributeDataFromSvg(lines[1],"height").removesuffix("pt"))
-        except:
-            pass
+        found = 0
+        for line in lines:
+            if inner_wall.check(line) or outer_wall.check(line):
+                found = found + 1
 
+        print(found)
 
-        maxHeight = height - 30
-        footer = getFooter(lines)
-        if footer!=None:
-            maxHeight = footer.y.min
+        if found > 10:
+            header = getHeaderBar(lines)
 
-        print(maxHeight)
-        print(header.y.max)
+            height = 842
+            try:
+                height = float(getAttributeDataFromSvg(lines[1],"height").removesuffix("pt"))
+            except:
+                pass
 
-        # for line in lines:
-        #     data = getWallInformationBySVG(line)
-        #     if data!=None and data.min.y >= header.y.max and data.max.y <= maxHeight and ( inner_wall.check(line) or  outer_wall.check(line)):
-        #         floorplans.append({
-        #             "lines":lines
-        #         })
+            maxHeight = height - 30
+            footer = getFooter(lines)
+            if footer!=None:
+                maxHeight = footer.y.min
+
+            print(f"{idx+1}.svg | maxHeight={maxHeight} header.y.max={header.y.max}")
+
+            # for line in lines:
+            #     data = getWallInformationBySVG(line)
+            #     if data!=None and data.min.y >= header.y.max and data.max.y <= maxHeight and ( inner_wall.check(line) or  outer_wall.check(line)):
+            #         floorplans.append({
+            #             "lines":lines
+            #         })

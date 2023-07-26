@@ -116,7 +116,7 @@ def getMinMaxValuesBySVG(d:List[str],raw:str):
                     max[1] = temp[1]
     
     corrected = False
-    if len(d)==2 and d[1].startswith("matrix"):
+    if len(d)==2 and d[1]!=None and d[1].startswith("matrix"):
         corrected = True
         mat = getMatrixFromString(d[1])
         min = matrixTransformByMatrix(mat,min[0], min[1])
