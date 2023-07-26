@@ -10,6 +10,8 @@ __pycache__
 temp/
 routes/**/__init__.py
 uploaded/
+ImageMagick/*
+pdf2svg/*
 *.md
 
 ml/models/stairs/stairs
