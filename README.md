@@ -52,6 +52,38 @@ A simple web server (firing the documentation seen below) can be started using `
 A full analysis of a floorplan PDF from Heinz von Heiden can be run via `python batch.py`.
 Make sure you have a PDF inside the [uploaded/](uploaded/) folder and you change the path inside the [batch.py](batch.py) inside the line starting with `floorplans,svgs,pngs = GenerateFloorplans(`. Yes this is really badly done but we didn't want to change the whole code after the presentation!
 
+# Fixes after presentation
+
+As we encountered the problem where wall features didnt match the walls, we had to postpone it.
+
+After about 10-20minutes thinking and rubberduck debugging we finally found the issue.
+
+Code before
+
+```python
+def getPointsByItem(item,idx):
+    xplus = (floorplans[idx].bbox[0])/IMAGE_SCALE_FACTOR
+    yplus = (floorplans[idx].bbox[1] + floorplans[idx].header.y.max)/IMAGE_SCALE_FACTOR
+    return Point(item.xmin+xplus,item.ymin+yplus),Point(item.xmax+xplus,item.ymax+yplus),item.object
+```
+
+after
+
+```python
+def getPointsByItem(item,idx):
+    xplus = (floorplans[idx].bbox[0])
+    yplus = ((floorplans[idx].header.y.max+IMAGE_SCALE_FACTOR)*IMAGE_SCALE_FACTOR + floorplans[idx].bbox[1])
+    return Point(
+        (item.xmin+xplus)/IMAGE_SCALE_FACTOR,
+        (item.ymin+yplus)/IMAGE_SCALE_FACTOR
+    ), Point(
+        (item.xmax+xplus)/IMAGE_SCALE_FACTOR,
+        (item.ymax+yplus)/IMAGE_SCALE_FACTOR
+    ), item.object
+```
+
+As you can see, we just had to move the IMAGE_SCALE_FACTOR division from the additive variables to the whole calculation and we were fine.
+
 # API Dokumentation
 
 [POST] `/floorplan/generate`\

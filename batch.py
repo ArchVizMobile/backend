@@ -109,6 +109,7 @@ def GenerateFloorplans(pdf:str):
                     height = float(getAttributeDataFromSvg(lines[1],"height").removesuffix("pt"))
                 except:
                     pass
+
                 width = 595.
                 try:
                     width = float(getAttributeDataFromSvg(lines[1],"width").removesuffix("pt"))
@@ -159,14 +160,15 @@ detect_timer = Timer("Detect")
 out = runPipeline(images)
 
 def getPointsByItem(item,idx):
-    xplus = (floorplans[idx].bbox[0])/IMAGE_SCALE_FACTOR
-    yplus = (floorplans[idx].bbox[1] + floorplans[idx].header.y.max)/IMAGE_SCALE_FACTOR
-    # xplus = (floorplans[idx].bbox[0])
-    # yplus = (floorplans[idx].bbox[1] + floorplans[idx].header.y.max)
-    # xplus = 0
-    # yplus = 0
-    offset = 0
-    return Point(item.xmin+xplus-offset,item.ymin+yplus-offset),Point(item.xmax+xplus+offset,item.ymax+yplus+offset),item.object
+    xplus = (floorplans[idx].bbox[0])
+    yplus = ((floorplans[idx].header.y.max+IMAGE_SCALE_FACTOR)*IMAGE_SCALE_FACTOR + floorplans[idx].bbox[1])
+    return Point(
+        (item.xmin+xplus)/IMAGE_SCALE_FACTOR,
+        (item.ymin+yplus)/IMAGE_SCALE_FACTOR
+    ), Point(
+        (item.xmax+xplus)/IMAGE_SCALE_FACTOR,
+        (item.ymax+yplus)/IMAGE_SCALE_FACTOR
+    ), item.object
 
 for idx,floor in enumerate(out):
     # print(f"stairs={floor['stairs']}\n")
@@ -390,14 +392,14 @@ response["floors"] = {
 print(f"{n} walls found")
 # print(response)
 
-# myclient = pymongo.MongoClient(f"mongodb://{CONFIG.getDB_HOST()}:{CONFIG.getDB_PORT()}/")
-# mydb = myclient[CONFIG.getDB_DATABASE()]
-# dbCollection = mydb["floorplans"]
-# json = jsonpickle.encode(response, unpicklable=False)
-# id = dbCollection.insert_one(jsonpickle.decode(json))
-# response["_id"] = str(id.inserted_id)
-# # print(response)
-# print(f"Floorplan ID= {str(id.inserted_id)}")
+myclient = pymongo.MongoClient(f"mongodb://{CONFIG.getDB_HOST()}:{CONFIG.getDB_PORT()}/")
+mydb = myclient[CONFIG.getDB_DATABASE()]
+dbCollection = mydb["floorplans"]
+json = jsonpickle.encode(response, unpicklable=False)
+id = dbCollection.insert_one(jsonpickle.decode(json))
+response["_id"] = str(id.inserted_id)
+# print(response)
+print(f"Floorplan ID= {str(id.inserted_id)}")
 
 
 print(response_timer)
