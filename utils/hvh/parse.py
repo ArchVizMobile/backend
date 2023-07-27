@@ -183,11 +183,23 @@ class Feature:
 
 class Window(Feature):
     def __init__(self, fr: Point3D, to: Point3D,cls:str) -> None:
-        super().__init__(fr, to)
+        super().__init__(fr, to,cls)
+
+    def __str__(self) -> str:
+        return f"Window(\"{self.cls}\" from x={self.fr.x}, y={self.fr.y} | to x={self.to.x}, y={self.to.y})"
+    
+    def __repr__(self) -> str:
+        return f"Window(\"{self.cls}\" from x={self.fr.x}, y={self.fr.y} | to x={self.to.x}, y={self.to.y})"
 
 class Door(Feature):
     def __init__(self, fr: Point3D, to: Point3D,cls:str) -> None:
-        super().__init__(fr, to)
+        super().__init__(fr, to,cls)
+
+    def __str__(self) -> str:
+        return f"Door(\"{self.cls}\" from x={self.fr.x}, y={self.fr.y} | to x={self.to.x}, y={self.to.y})"
+    
+    def __repr__(self) -> str:
+        return f"Door(\"{self.cls}\" from x={self.fr.x}, y={self.fr.y} | to x={self.to.x}, y={self.to.y})"
 
 class Gap:
     def __init__(self, fr: Point, to: Point) -> None:

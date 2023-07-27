@@ -136,15 +136,17 @@ def GenerateFloorplans(pdf:str):
     return floorplans,svgs,pngs
 
 class Timer:
-    def __init__(self) -> None:
+    def __init__(self,name:str) -> None:
         self.start = time.time()
+        self.name = name
         pass
 
     def __str__(self):
         end = time.time()
-        return (f"Took ~{round(end-self.start)}s")
+        return (f"[{self.name} Timer] Took ~{round(end-self.start)}s")
 
-generate_timer = Timer()
+generate_timer = Timer("Generate")
+together_timer = Timer("Together")
 floorplans,svgs,pngs = GenerateFloorplans("uploaded/Calvus 631.pdf")
 print(generate_timer) # ~9s
 
@@ -152,23 +154,29 @@ images = [plan.image for plan in floorplans]
 # images = ['uploaded/Calvus 631\\4.2.png', 'uploaded/Calvus 631\\5.2.png']
 # print(images)
 
-detect_timer = Timer()
+detect_timer = Timer("Detect")
 
 out = runPipeline(images)
 
-def getPointsByItem(item):
-    return Point(item.xmin,item.ymin),Point(item.xmax,item.ymax),item.object
+def getPointsByItem(item,idx):
+    xplus = (floorplans[idx].bbox[0])/IMAGE_SCALE_FACTOR
+    yplus = (floorplans[idx].bbox[1] + floorplans[idx].header.y.max)/IMAGE_SCALE_FACTOR
+    # xplus = (floorplans[idx].bbox[0])
+    # yplus = (floorplans[idx].bbox[1] + floorplans[idx].header.y.max)
+    # xplus = 0
+    # yplus = 0
+    offset = 0
+    return Point(item.xmin+xplus-offset,item.ymin+yplus-offset),Point(item.xmax+xplus+offset,item.ymax+yplus+offset),item.object
 
 for idx,floor in enumerate(out):
     # print(f"stairs={floor['stairs']}\n")
-    print(f"wallfeatures={floor['wallfeatures']}\n")
-    print(f"wallfeatures.window={floor['wallfeatures'].window}\n")
+    # print(f"wallfeatures={floor['wallfeatures']}\n")
+    # print(f"wallfeatures.window={floor['wallfeatures'].window}\n")
     # print(f"furniture={floor['furniture']}\n")
 
     if floor['wallfeatures'].window!=None:
         for window in floor['wallfeatures'].window:
-            fr,to,obj = getPointsByItem(window)
-            # print(window,fr,to,obj)
+            fr,to,obj = getPointsByItem(window,idx)
             for wall in floorplans[idx].walls:
                 gap = wall.hasGap(fr,to)
                 if gap!=None:
@@ -177,141 +185,109 @@ for idx,floor in enumerate(out):
 
     if floor['wallfeatures'].door!=None:
         for door in floor['wallfeatures'].door:
-            fr,to,obj = getPointsByItem(door)
+            fr,to,obj = getPointsByItem(door,idx)
             for wall in floorplans[idx].walls:
                 gap = wall.hasGap(fr,to)
                 if gap!=None:
+                    # print(gap)
                     wall.addDoor(Door(gap.fr,gap.to,obj))
 
     if floor['wallfeatures'].doubleDoor!=None:
         for door in floor['wallfeatures'].doubleDoor:
-            fr,to,obj = getPointsByItem(door)
+            fr,to,obj = getPointsByItem(door,idx)
             for wall in floorplans[idx].walls:
                 gap = wall.hasGap(fr,to)
                 if gap!=None:
+                    # print(gap)
                     wall.addDoor(Door(gap.fr,gap.to,obj))
 
     # Furniture
 
     if floor['furniture'].armchair!=None:
         for furniture in floor['furniture'].armchair:
-            fr,to,obj = getPointsByItem(furniture)
+            fr,to,obj = getPointsByItem(furniture,idx)
             floorplans[idx].addFurniture(Furniture(fr,to,obj))
 
     if floor['furniture'].bathtub!=None:
         for furniture in floor['furniture'].bathtub:
-            fr,to,obj = getPointsByItem(furniture)
+            fr,to,obj = getPointsByItem(furniture,idx)
             floorplans[idx].addFurniture(Furniture(fr,to,obj))
 
     if floor['furniture'].bed!=None:
         for furniture in floor['furniture'].bed:
-            fr,to,obj = getPointsByItem(furniture)
+            fr,to,obj = getPointsByItem(furniture,idx)
             floorplans[idx].addFurniture(Furniture(fr,to,obj))
 
     if floor['furniture'].couch!=None:
         for furniture in floor['furniture'].couch:
-            fr,to,obj = getPointsByItem(furniture)
+            fr,to,obj = getPointsByItem(furniture,idx)
             floorplans[idx].addFurniture(Furniture(fr,to,obj))
 
     if floor['furniture'].desk!=None:
         for furniture in floor['furniture'].desk:
-            fr,to,obj = getPointsByItem(furniture)
+            fr,to,obj = getPointsByItem(furniture,idx)
             floorplans[idx].addFurniture(Furniture(fr,to,obj))
 
     if floor['furniture'].dining_table_4_chairs!=None:
         for furniture in floor['furniture'].dining_table_4_chairs:
-            fr,to,obj = getPointsByItem(furniture)
+            fr,to,obj = getPointsByItem(furniture,idx)
             floorplans[idx].addFurniture(Furniture(fr,to,obj))
 
     if floor['furniture'].dining_table_6_chairs!=None:
         for furniture in floor['furniture'].dining_table_6_chairs:
-            fr,to,obj = getPointsByItem(furniture)
+            fr,to,obj = getPointsByItem(furniture,idx)
             floorplans[idx].addFurniture(Furniture(fr,to,obj))
 
     if floor['furniture'].kitchenette!=None:
         for furniture in floor['furniture'].kitchenette:
-            fr,to,obj = getPointsByItem(furniture)
+            fr,to,obj = getPointsByItem(furniture,idx)
             floorplans[idx].addFurniture(Furniture(fr,to,obj))
 
     if floor['furniture'].lowboardTV!=None:
         for furniture in floor['furniture'].lowboardTV:
-            fr,to,obj = getPointsByItem(furniture)
+            fr,to,obj = getPointsByItem(furniture,idx)
             floorplans[idx].addFurniture(Furniture(fr,to,obj))
 
     if floor['furniture'].masterbed!=None:
         for furniture in floor['furniture'].masterbed:
-            fr,to,obj = getPointsByItem(furniture)
+            fr,to,obj = getPointsByItem(furniture,idx)
             floorplans[idx].addFurniture(Furniture(fr,to,obj))
 
     if floor['furniture'].shelf!=None:
         for furniture in floor['furniture'].shelf:
-            fr,to,obj = getPointsByItem(furniture)
+            fr,to,obj = getPointsByItem(furniture,idx)
             floorplans[idx].addFurniture(Furniture(fr,to,obj))
 
     if floor['furniture'].shower!=None:
         for furniture in floor['furniture'].shower:
-            fr,to,obj = getPointsByItem(furniture)
+            fr,to,obj = getPointsByItem(furniture,idx)
             floorplans[idx].addFurniture(Furniture(fr,to,obj))
 
     if floor['furniture'].sink!=None:
         for furniture in floor['furniture'].sink:
-            fr,to,obj = getPointsByItem(furniture)
+            fr,to,obj = getPointsByItem(furniture,idx)
             floorplans[idx].addFurniture(Furniture(fr,to,obj))
 
     if floor['furniture'].table!=None:
         for furniture in floor['furniture'].table:
-            fr,to,obj = getPointsByItem(furniture)
+            fr,to,obj = getPointsByItem(furniture,idx)
             floorplans[idx].addFurniture(Furniture(fr,to,obj))
 
     if floor['furniture'].wc!=None:
         for furniture in floor['furniture'].wc:
-            fr,to,obj = getPointsByItem(furniture)
+            fr,to,obj = getPointsByItem(furniture,idx)
             floorplans[idx].addFurniture(Furniture(fr,to,obj))
 
 print(detect_timer)
-# f = {
-#     "fromPosition": {
-#         "x": 150,
-#         "y": 150
-#     },
-#     "toPosition": {
-#         "x": 840,
-#         "y": 150
-#     },
-#     "isHorizontal": True,
-#     "isOuterWall": True,
-#     "features": [
-#         {
-#             "fromPosition": 60,
-#             "toPosition": 180,
-#             "hinge": -1,
-#             "openLeft": False,
-#             "style": "default",
-#             "z": 178,
-#             "height": 127,
-#             "type": "WINDOW"
-#         },
-#         {
-#             "fromPosition": 360,
-#             "toPosition": 483,
-#             "hinge": -1,
-#             "openLeft": False,
-#             "style": "default",
-#             "z": 178,
-#             "height": 127,
-#             "type": "WINDOW"
-#         }
-#     ],
-#     "depth": 30,
-#     "height": 435
-# }
+response_timer = Timer("Response")
 
 response = {
   "success": True,
-  "name": "Keine 3k Wände",
+  "name": "Grundriss mit Türen (in falscher Position) und Einrichtung",
   "walls": [],
   "junctions": [],
   "rooms": [],
+  "furniture": [],
   "scale": 1,
 #   "stories": len(floorplans)
 }
@@ -384,15 +360,28 @@ for idx,plan in enumerate(floorplans):
                 "type": feature.cls
             })
         response["walls"].append(w)
-
+    for item in plan.furniture:
+        response["furniture"].append({
+            "fromPosition":{
+                "x": item.fr.x,
+                "y": item.fr.y,
+            },
+            "toPosition":{
+                "x": item.to.x,
+                "y": item.to.y,
+            },
+            "item": item.obj,
+            "z": idx*TARGET_CEILING_HEIGHT
+        })
+    
 response["floors"] = {
     "fromPosition":{
-        "x": (min[0]),
-        "y": (min[1]),
+        "x": (min[0])*SCALE,
+        "y": (min[1])*SCALE,
     },
     "toPosition":{
-        "x": (max[0]),
-        "y": (max[1]),
+        "x": (max[0])*SCALE,
+        "y": (max[1])*SCALE,
     },
     "floors": len(floorplans),
     "height": TARGET_CEILING_HEIGHT
@@ -401,10 +390,15 @@ response["floors"] = {
 print(f"{n} walls found")
 # print(response)
 
-myclient = pymongo.MongoClient(f"mongodb://{CONFIG.getDB_HOST()}:{CONFIG.getDB_PORT()}/")
-mydb = myclient[CONFIG.getDB_DATABASE()]
-dbCollection = mydb["floorplans"]
-json = jsonpickle.encode(response, unpicklable=False)
-id = dbCollection.insert_one(jsonpickle.decode(json))
-response["_id"] = str(id.inserted_id)
-print(response)
+# myclient = pymongo.MongoClient(f"mongodb://{CONFIG.getDB_HOST()}:{CONFIG.getDB_PORT()}/")
+# mydb = myclient[CONFIG.getDB_DATABASE()]
+# dbCollection = mydb["floorplans"]
+# json = jsonpickle.encode(response, unpicklable=False)
+# id = dbCollection.insert_one(jsonpickle.decode(json))
+# response["_id"] = str(id.inserted_id)
+# # print(response)
+# print(f"Floorplan ID= {str(id.inserted_id)}")
+
+
+print(response_timer)
+print(together_timer)
