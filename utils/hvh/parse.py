@@ -250,7 +250,7 @@ class Wall:
         self.windows:List[Window] = []
         self.doors:List[Door] = []
     
-    def hasGap(self,fr:Point,to:Point,offset=5):
+    def hasGap(self,fr:Point,to:Point,offset=2):
         box1 = Gap(Point(fr.x-offset,fr.y-offset),Point(to.x+offset,to.y+offset))
 
         for gap in self.gaps:
