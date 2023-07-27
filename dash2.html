@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h3 id="title"></h3>
+    <div id="data"></div>
+    <script>
+        fetch("http://api.lisha-app.com:1234/floorplan/list").then(e => e.json()).then(data => {
+            fetch(`http://api.lisha-app.com:1234/floorplan?id=${data.list.at(-1).id}`).then(e => e.json()).then(data => {
+                run(data)
+            })
+        })
+
+        function run(data) {
+            document.getElementById("title").innerText = data.name
+            dataDiv = document.getElementById("data")
+            dataDiv.style.width = `${Math.ceil(data.floors.fromPosition.x + data.floors.toPosition.x)}px`
+            dataDiv.style.height = `${Math.ceil(data.floors.fromPosition.y + data.floors.toPosition.y)}px`
+            // dataDiv.style.background = `#eee`
+
+            data.walls.filter(w => w.startHeight === 0).map((wall, wallIdx) => {
+                const div = document.createElement("div")
+                div.setAttribute("data-json", JSON.stringify(wall))
+                div.style.background = "#000"
+                div.style.position = "absolute"
+                div.style.top = `${wall.fromPosition.y}px`
+                div.style.left = `${wall.fromPosition.x}px`
+                // div.innerText = `Wand ${wallIdx}`
+
+                if (wall.isHorizontal) {
+                    div.style.width = `${wall.toPosition.x - wall.fromPosition.x}px`
+                    div.style.height = `${wall.depth}px`
+                } else {
+                    div.style.height = `${wall.toPosition.y - wall.fromPosition.y}px`
+                    div.style.width = `${wall.depth}px`
+                }
+                wall.features.map(feature => {
+                    const box = document.createElement("div")
+                    box.setAttribute("data-json", JSON.stringify(feature))
+                    // fromPosition: 67.4375
+                    // height: 220
+                    // hinge: -1
+                    // openLeft: false
+                    // style: "door"
+                    // toPosition: 113.28125
+                    // type: "door"
+                    // z: 0
+
+                    box.style.background = feature.type === "door" ? "#f00" : "#00f"
+                    box.style.position = "absolute"
+                    // box.innerText = feature.type
+
+                    if (wall.isHorizontal) {
+                        box.style.left = `${feature.fromPosition}px`
+                        box.style.width = `${feature.toPosition - feature.fromPosition}px`
+                        box.style.height = `${wall.depth}px`
+                    } else {
+                        box.style.top = `${feature.fromPosition}px`
+                        box.style.height = `${feature.toPosition - feature.fromPosition}px`
+                        box.style.width = `${wall.depth}px`
+                    }
+                    return box
+
+                }).forEach(item => {
+                    div.appendChild(item)
+                })
+                return div
+            }).forEach(div => {
+                dataDiv.appendChild(div)
+            });
+            // document.getElementById("data").inner
+        }
+    </script>
+</body>
+
+</html>
