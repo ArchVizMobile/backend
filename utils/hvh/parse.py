@@ -179,6 +179,7 @@ class Feature:
     def __init__(self,fr:Point3D,to:Point3D,cls:str) -> None:
         self.fr = fr
         self.to = to
+        self.cls = cls
 
 class Window(Feature):
     def __init__(self, fr: Point3D, to: Point3D,cls:str) -> None:

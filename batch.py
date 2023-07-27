@@ -3,6 +3,9 @@ import os
 import time
 from typing import List
 from PIL import Image, ImageChops
+import jsonpickle
+import pymongo
+from config import CONFIG
 
 from routes.floorplan.hvh.parse.get import Color, getFooter, getHeaderBar
 from runPipeline import runPipeline
@@ -11,6 +14,7 @@ from utils.hvh.parse import Door, MinMaxValue, Point, Point3D, Wall, Window, get
 header_bar = Color("87.889099%,92.576599%,96.484375%")
 outer_wall = Color("83.59375%,83.59375%,83.59375%")
 inner_wall = Color("50%,50%,50%")
+inner_wall_2 = Color("49.609375%,49.609375%,49.609375%")
 input_field = Color("96.875%,96.875%,96.875%")
 table_heading = Color("88.28125%,88.28125%,88.28125%")
 entry = Color("39.501953%,39.501953%,39.501953%")
@@ -44,9 +48,10 @@ class Floorplan:
         self.furniture:List[Furniture] = []
 
         for line in svg:
-            wall = getWallInformationBySVG(line)
-            if wall!=None:
-                self.walls.append(wall)
+            if inner_wall.check(line) or inner_wall_2.check(line):
+                wall = getWallInformationBySVG(line)
+                if wall!=None:
+                    self.walls.append(wall)
 
     def __repr__(self) -> str:
         return f"Floorplan({self.image})"
@@ -162,24 +167,26 @@ for idx,floor in enumerate(out):
 
     if floor['wallfeatures'].window!=None:
         for window in floor['wallfeatures'].window:
+            fr,to,obj = getPointsByItem(window)
+            # print(window,fr,to,obj)
             for wall in floorplans[idx].walls:
-                fr,to,obj = getPointsByItem(window)
                 gap = wall.hasGap(fr,to)
                 if gap!=None:
+                    # print(gap)
                     wall.addWindow(Window(gap.fr,gap.to,obj))
 
     if floor['wallfeatures'].door!=None:
         for door in floor['wallfeatures'].door:
+            fr,to,obj = getPointsByItem(door)
             for wall in floorplans[idx].walls:
-                fr,to,obj = getPointsByItem(window)
                 gap = wall.hasGap(fr,to)
                 if gap!=None:
                     wall.addDoor(Door(gap.fr,gap.to,obj))
 
     if floor['wallfeatures'].doubleDoor!=None:
         for door in floor['wallfeatures'].doubleDoor:
+            fr,to,obj = getPointsByItem(door)
             for wall in floorplans[idx].walls:
-                fr,to,obj = getPointsByItem(window)
                 gap = wall.hasGap(fr,to)
                 if gap!=None:
                     wall.addDoor(Door(gap.fr,gap.to,obj))
@@ -262,89 +269,142 @@ for idx,floor in enumerate(out):
             floorplans[idx].addFurniture(Furniture(fr,to,obj))
 
 print(detect_timer)
-f = {
-    "fromPosition": {
-        "x": 150,
-        "y": 150
-    },
-    "toPosition": {
-        "x": 840,
-        "y": 150
-    },
-    "isHorizontal": True,
-    "isOuterWall": True,
-    "features": [
-        {
-            "fromPosition": 60,
-            "toPosition": 180,
-            "hinge": -1,
-            "openLeft": False,
-            "style": "default",
-            "z": 178,
-            "height": 127,
-            "type": "WINDOW"
-        },
-        {
-            "fromPosition": 360,
-            "toPosition": 483,
-            "hinge": -1,
-            "openLeft": False,
-            "style": "default",
-            "z": 178,
-            "height": 127,
-            "type": "WINDOW"
-        }
-    ],
-    "depth": 30,
-    "height": 435
-}
+# f = {
+#     "fromPosition": {
+#         "x": 150,
+#         "y": 150
+#     },
+#     "toPosition": {
+#         "x": 840,
+#         "y": 150
+#     },
+#     "isHorizontal": True,
+#     "isOuterWall": True,
+#     "features": [
+#         {
+#             "fromPosition": 60,
+#             "toPosition": 180,
+#             "hinge": -1,
+#             "openLeft": False,
+#             "style": "default",
+#             "z": 178,
+#             "height": 127,
+#             "type": "WINDOW"
+#         },
+#         {
+#             "fromPosition": 360,
+#             "toPosition": 483,
+#             "hinge": -1,
+#             "openLeft": False,
+#             "style": "default",
+#             "z": 178,
+#             "height": 127,
+#             "type": "WINDOW"
+#         }
+#     ],
+#     "depth": 30,
+#     "height": 435
+# }
 
 response = {
   "success": True,
-  "name": "LELE ROFL",
+  "name": "Keine 3k Wände",
   "walls": [],
   "junctions": [],
   "rooms": [],
-  "scale": -1,
-  "_id": "",
+  "scale": 1,
+#   "stories": len(floorplans)
 }
-for plan in floorplans:
+
+TARGET_CEILING_HEIGHT = 300
+SCALE = 3.5
+
+min = [99999999999999999999999,99999999999999999999999]
+max = [-99999999999999999999999,-99999999999999999999999]
+
+n = 0
+# print(floorplans)
+for idx,plan in enumerate(floorplans):
+    # print(len(plan.walls))
     for wall in plan.walls:
+
+        if wall.min.x < min[0]:
+            min[0] = wall.min.x
+        if wall.min.y < min[1]:
+            min[1] = wall.min.y
+
+        if wall.max.x > max[0]:
+            max[0] = wall.max.x
+        if wall.max.y > max[1]:
+            max[1] = wall.max.y
+
+        n = n + 1
         w = {
             "fromPosition": {
-                "x": wall.min.x,
-                "y": wall.min.y
+                "x": wall.min.x*SCALE,
+                "y": wall.min.y*SCALE
             },
             "toPosition": {
-                "x": wall.min.x if wall.isHorizontal else wall.max.x,
-                "y": wall.max.y if wall.isHorizontal else wall.min.y
+                "x": (wall.min.x if not wall.isHorizontal else wall.max.x)*SCALE,
+                "y": ((wall.max.y if not wall.isHorizontal else wall.min.y))*SCALE
             },
             "isHorizontal": wall.isHorizontal,
             "isOuterWall": False,
-            "features": [
-                
-            ],
-            "depth": 30,
-            "height": 435
+            "features": [],
+            "depth": (wall.max.y-wall.min.y if  wall.isHorizontal else wall.max.x-wall.min.x)*SCALE,
+            "height": TARGET_CEILING_HEIGHT,
+            "startHeight": TARGET_CEILING_HEIGHT*idx
         }
+        # if(len(wall.doors)>0):
+            # print(wall.doors)
+        # if(len(wall.windows)>0):
+            # print(wall.windows)
         for feature in wall.doors:
+            print(feature)
             w["features"].append({
-                "fromPosition": 60,
-                "toPosition": 180,
+                "fromPosition": (feature.fr.x if not wall.isHorizontal else feature.fr.y)*SCALE,
+                "toPosition": (feature.to.x if not wall.isHorizontal else feature.to.y)*SCALE,
                 "hinge": -1,
                 "openLeft": False,
-                "style": "default",
-                "z": 178,
-                "height": 127,
-                "type": "WINDOW"
+                "style": feature.cls,
+                "z": 0,
+                "height": 220,
+                "type": feature.cls
             })
-        #         {
-        #             "fromPosition": 360,
-        #             "toPosition": 483,
-        #             "hinge": -1,
-        #             "openLeft": False,
-        #             "style": "default",
-        #             "z": 178,
-        #             "height": 127,
-        #             "type": "WINDOW"
-        #         }
+        for feature in wall.windows:
+            print(feature)
+            w["features"].append({
+                "fromPosition": (feature.fr.x if not wall.isHorizontal else feature.fr.y)*SCALE,
+                "toPosition": (feature.to.x if not wall.isHorizontal else feature.to.y)*SCALE,
+                "hinge": (feature.fr.x if not wall.isHorizontal else feature.fr.y)*SCALE,
+                "openLeft": False,
+                "style": feature.cls,
+                "z": 0,
+                "height": 220,
+                "type": feature.cls
+            })
+        response["walls"].append(w)
+
+response["floors"] = {
+    "fromPosition":{
+        "x": (min[0]),
+        "y": (min[1]),
+    },
+    "toPosition":{
+        "x": (max[0]),
+        "y": (max[1]),
+    },
+    "floors": len(floorplans),
+    "height": TARGET_CEILING_HEIGHT
+}
+
+print(f"{n} walls found")
+# print(response)
+
+myclient = pymongo.MongoClient(f"mongodb://{CONFIG.getDB_HOST()}:{CONFIG.getDB_PORT()}/")
+mydb = myclient[CONFIG.getDB_DATABASE()]
+dbCollection = mydb["floorplans"]
+json = jsonpickle.encode(response, unpicklable=False)
+id = dbCollection.insert_one(jsonpickle.decode(json))
+response["_id"] = str(id.inserted_id)
+print(response)
