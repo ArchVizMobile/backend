@@ -1,5 +1,7 @@
 # Installation
 
+## Prerequisites
+
 To get started, we recommend using this software on a windows machine with a nvidia gpu connected.
 
 Make sure you have cuda installed and you know your cuda version.
@@ -8,15 +10,19 @@ Head over to [https://pytorch.org/get-started/locally/](https://pytorch.org/) to
 
 This code was developed using `Python 3.11` - it is a must to use >3.11 because python api's have been used that were introduced in 3.11!
 
-Next install required modules via
+For the Database we used a MongoDB - Make sure you have a running instance of it!
+
+## Installation
+
+Before Installing, make sure you have the repository cloned on your machine.
+
+Install required modules via:
 
 ```bash
 pip install -r requirements.txt
 ```
 
 Before usage, make sure you copy the [.env.example](.env.example) into a [.env](.env) file and fill it according to your data.
-
-For the Database we used a MongoDB.
 
 An example config can be found below.
 
