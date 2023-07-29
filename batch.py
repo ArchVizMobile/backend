@@ -9,7 +9,7 @@ from config import CONFIG
 
 from routes.floorplan.hvh.parse.get import Color, getFooter, getHeaderBar
 from runPipeline import runPipeline
-from utils.hvh.parse import Door, MinMaxValue, Point, Point3D, Wall, Window, getAttributeDataFromSvg, getDataByLine, getWallInformationBySVG
+from utils.hvh.parse import Door, Gap, MinMaxValue, Point, Point3D, Wall, Window, getAttributeDataFromSvg, getDataByLine, getWallInformationBySVG
 
 file = "uploaded/Calvus 631.pdf"
 
@@ -284,13 +284,51 @@ print(detect_timer)
 response_timer = Timer("Response")
 
 TARGET_CEILING_HEIGHT = 300
-SCALE = 1
+
+SCALE = 3.5
+
+# entries:List[Wall] = []
+# for plan in floorplans:
+#     for line in plan.svg:
+#         if entry.check(line):
+#             wall = getWallInformationBySVG(line)
+#             # print(line)
+#             # print(wall)
+#             entries.append(wall)
+
+# foundEntries = {}
+# for entry in entries:
+#     for plan in floorplans:
+#         for walls in plan.walls:
+#             gap = wall.hasGap(Point(entry.min.x,entry.min.y),Point(entry.max.x,entry.max.y),10)
+#             if gap!=None:
+#                 foundEntries[gap.__str__()] = gap
+
+# TARGET_DOOR_WIDTH = 113
+
+# entry_gap:Gap = foundEntries[list(foundEntries.keys())[0]]
+# # if entry_gap.fr.x - entry_gap.to.x > entry_gap.fr.y - entry_gap.to.y:
+#     # Hozizontal
+#     # SCALE_FACTOR = (entry_gap.fr.x - entry_gap.to.x)
+# # else:
+#     # SCALE_FACTOR = (entry_gap.fr.y - entry_gap.to.y)
+# SCALE_FACTOR = TARGET_DOOR_WIDTH/(entry_gap.fr.y - entry_gap.to.y)
+# print(entry_gap)
+# print(SCALE_FACTOR)
+# entry_json = {
+#     "top": entry_gap.fr.y,
+#     "left": entry_gap.to.x,
+#     "height": entry_gap.to.y-entry_gap.fr.y,
+#     "width": entry_gap.fr.x-entry_gap.to.x,
+# }
+# print(entry_json)
 
 response = {
   "success": True,
   "name": f"Grundriss von {file} generiert am {time.strftime('%X %x')}",
   "walls": [],
   "junctions": [],
+#   "entry":entry_json,
   "rooms": [],
   "furniture": [],
   "scale": SCALE,
@@ -347,8 +385,8 @@ for idx,plan in enumerate(floorplans):
                 toPosition = feature.to.y - wall.min.y
 
             w["gaps"].append({
-                "fromPosition":fromPosition,
-                "toPosition":toPosition
+                "fromPosition":fromPosition*SCALE,
+                "toPosition":toPosition*SCALE
             })
         for feature in wall.doors:
             if wall.isHorizontal:
@@ -379,9 +417,9 @@ for idx,plan in enumerate(floorplans):
 
             # print(feature)
             w["features"].append({
-                "fromPosition": fromPosition,
-                "toPosition": toPosition,
-                "hinge": fromPosition,
+                "fromPosition": fromPosition*SCALE,
+                "toPosition": toPosition*SCALE,
+                "hinge": fromPosition*SCALE,
                 "openLeft": False,
                 "style": feature.cls,
                 "z": 0,

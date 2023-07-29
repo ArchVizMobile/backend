@@ -56,6 +56,16 @@
             dataDiv.style.width = `${Math.ceil(data.floors.fromPosition.x + data.floors.toPosition.x)}px`
             dataDiv.style.height = `${Math.ceil(data.floors.fromPosition.y + data.floors.toPosition.y)}px`
 
+            // const entry = document.createElement("div")
+            // entry.style.position = "absolute"
+            // entry.style.top = `${data.entry.top}px`
+            // entry.style.left = `${data.entry.left}px`
+            // entry.style.height = `${data.entry.height}px`
+            // entry.style.width = `${data.entry.width}px`
+            // entry.style.background = "#ff8800"
+            // entry.style.zIndex = 100
+            // dataDiv.appendChild(entry)
+
             data.walls.filter(w => w.startHeight === 300 * (FLOOR - 1)).map((wall, wallIdx) => {
                 const wallDiv = document.createElement("div")
                 wallDiv.setAttribute("data-json", JSON.stringify(wall))
