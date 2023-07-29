@@ -11,6 +11,8 @@ from routes.floorplan.hvh.parse.get import Color, getFooter, getHeaderBar
 from runPipeline import runPipeline
 from utils.hvh.parse import Door, MinMaxValue, Point, Point3D, Wall, Window, getAttributeDataFromSvg, getDataByLine, getWallInformationBySVG
 
+file = "uploaded/Calvus 631.pdf"
+
 header_bar = Color("87.889099%,92.576599%,96.484375%")
 outer_wall = Color("83.59375%,83.59375%,83.59375%")
 inner_wall = Color("50%,50%,50%")
@@ -70,8 +72,9 @@ def generateSVGs(file:str):
         with open(svg) as file_handle:
             lines = file_handle.read().split("\n")
             width = getAttributeDataFromSvg(lines[1],"width").removesuffix("pt")
+            height = getAttributeDataFromSvg(lines[1],"height").removesuffix("pt")
             print(f"[{baseName}] {svgidx+1}/{len(svgs)}")
-            cmd = f'ImageMagick\convert.exe -size {float(width)*IMAGE_SCALE_FACTOR} "{svg}" "uploaded/{baseName}/{svgidx+1}.png"'
+            cmd = f'ImageMagick\convert.exe -size {float(width)*IMAGE_SCALE_FACTOR}x{float(height)*IMAGE_SCALE_FACTOR} "{svg}" "uploaded/{baseName}/{svgidx+1}.png"'
             # print(cmd)
             os.system(cmd)
     return svgs,[f.replace(".svg",".png") for f in svgs]
@@ -148,7 +151,7 @@ class Timer:
 
 generate_timer = Timer("Generate")
 together_timer = Timer("Together")
-floorplans,svgs,pngs = GenerateFloorplans("uploaded/Calvus 631.pdf")
+floorplans,svgs,pngs = GenerateFloorplans(file)
 print(generate_timer) # ~9s
 
 images = [plan.image for plan in floorplans]
@@ -182,7 +185,6 @@ for idx,floor in enumerate(out):
             for wall in floorplans[idx].walls:
                 gap = wall.hasGap(fr,to)
                 if gap!=None:
-                    # print(gap)
                     wall.addWindow(Window(gap.fr,gap.to,obj))
 
     if floor['wallfeatures'].door!=None:
@@ -191,7 +193,6 @@ for idx,floor in enumerate(out):
             for wall in floorplans[idx].walls:
                 gap = wall.hasGap(fr,to)
                 if gap!=None:
-                    # print(gap)
                     wall.addDoor(Door(gap.fr,gap.to,obj))
 
     if floor['wallfeatures'].doubleDoor!=None:
@@ -200,7 +201,6 @@ for idx,floor in enumerate(out):
             for wall in floorplans[idx].walls:
                 gap = wall.hasGap(fr,to)
                 if gap!=None:
-                    # print(gap)
                     wall.addDoor(Door(gap.fr,gap.to,obj))
 
     # Furniture
@@ -283,19 +283,19 @@ for idx,floor in enumerate(out):
 print(detect_timer)
 response_timer = Timer("Response")
 
+TARGET_CEILING_HEIGHT = 300
+SCALE = 1
+
 response = {
   "success": True,
-  "name": "Grundriss mit Türen (in falscher Position) und Einrichtung",
+  "name": f"Grundriss von {file} generiert am {time.strftime('%X %x')}",
   "walls": [],
   "junctions": [],
   "rooms": [],
   "furniture": [],
-  "scale": 1,
+  "scale": SCALE,
 #   "stories": len(floorplans)
 }
-
-TARGET_CEILING_HEIGHT = 300
-SCALE = 3.5
 
 min = [99999999999999999999999,99999999999999999999999]
 max = [-99999999999999999999999,-99999999999999999999999]
@@ -329,6 +329,7 @@ for idx,plan in enumerate(floorplans):
             "isHorizontal": wall.isHorizontal,
             "isOuterWall": False,
             "features": [],
+            "gaps": [],
             "depth": (wall.max.y-wall.min.y if  wall.isHorizontal else wall.max.x-wall.min.x)*SCALE,
             "height": TARGET_CEILING_HEIGHT,
             "startHeight": TARGET_CEILING_HEIGHT*idx
@@ -337,11 +338,30 @@ for idx,plan in enumerate(floorplans):
             # print(wall.doors)
         # if(len(wall.windows)>0):
             # print(wall.windows)
+        for feature in wall.gaps:
+            if wall.isHorizontal:
+                fromPosition = (feature.fr.x - wall.min.x)
+                toPosition = (feature.to.x - wall.min.x)
+            else:
+                fromPosition = feature.fr.y - wall.min.y
+                toPosition = feature.to.y - wall.min.y
+
+            w["gaps"].append({
+                "fromPosition":fromPosition,
+                "toPosition":toPosition
+            })
         for feature in wall.doors:
-            print(feature)
+            if wall.isHorizontal:
+                fromPosition = (feature.fr.x - wall.min.x)
+                toPosition = (feature.to.x - wall.min.x)
+            else:
+                fromPosition = feature.fr.y - wall.min.y
+                toPosition = feature.to.y - wall.min.y
+
+            # print(feature)
             w["features"].append({
-                "fromPosition": (feature.fr.x if not wall.isHorizontal else feature.fr.y)*SCALE,
-                "toPosition": (feature.to.x if not wall.isHorizontal else feature.to.y)*SCALE,
+                "fromPosition": fromPosition*SCALE,
+                "toPosition": toPosition*SCALE,
                 "hinge": -1,
                 "openLeft": False,
                 "style": feature.cls,
@@ -350,11 +370,18 @@ for idx,plan in enumerate(floorplans):
                 "type": feature.cls
             })
         for feature in wall.windows:
-            print(feature)
+            if wall.isHorizontal:
+                fromPosition = feature.fr.x-wall.min.x
+                toPosition = feature.to.x-wall.min.x
+            else:
+                fromPosition = feature.fr.y-wall.min.y
+                toPosition = feature.to.y-wall.min.y
+
+            # print(feature)
             w["features"].append({
-                "fromPosition": (feature.fr.x if not wall.isHorizontal else feature.fr.y)*SCALE,
-                "toPosition": (feature.to.x if not wall.isHorizontal else feature.to.y)*SCALE,
-                "hinge": (feature.fr.x if not wall.isHorizontal else feature.fr.y)*SCALE,
+                "fromPosition": fromPosition,
+                "toPosition": toPosition,
+                "hinge": fromPosition,
                 "openLeft": False,
                 "style": feature.cls,
                 "z": 0,

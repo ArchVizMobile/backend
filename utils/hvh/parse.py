@@ -237,15 +237,18 @@ class Wall:
         else:
             self.boxes = sorted(self.boxes,key=lambda k: k.min.y)
 
+        # if len(self.boxes) >= 3:
+        #     print(f"[{len(self.boxes)}] {self.boxes}")
+
         n = 0
         last = None
-        for item in self.boxes:
-            if n==0:
-                n=1
-                last = item
-            elif n==1:
-                n=0
-                self.gaps.append(Gap(Point(item.min.x,last.max.y),Point(item.max.x,item.min.y)))
+        for n,item in enumerate(self.boxes):
+            if n>0:
+                if self.isHorizontal:
+                    self.gaps.append(Gap(Point(last.max.x,last.min.y),Point(item.min.x,item.max.y)))
+                else:
+                    self.gaps.append(Gap(Point(last.min.x,last.max.y),Point(item.max.x,item.min.y)))
+            last = item
         
         self.windows:List[Window] = []
         self.doors:List[Door] = []
@@ -278,8 +281,10 @@ def getWallInformationBySVG(raw:str):
         return None
     
     boxes = []
+    # print(f"data={data}")
     try:
         for box in data.split(" Z "):
+            # print(f"box={box}")
             points = []
 
             for pts in box.split("M ")[1].split(" L "):

@@ -62,7 +62,7 @@ class FurnitureService:
         self.model_data = model_data
 
     def detect(self, request: str) -> FurnitureDetectionResponse:
-        results = self.model.predict(request, save=True,name="../../"+request.replace(".png",".furniture"))
+        results = self.model.predict(request, save=False,name="../../"+request.replace(".png",".furniture"),verbose=False)
 
         response = FurnitureDetectionResponse()
         for res in results:

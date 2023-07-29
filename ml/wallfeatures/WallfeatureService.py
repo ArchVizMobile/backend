@@ -39,7 +39,7 @@ class WallFeatureService:
         self.model_data = model_data
 
     def detect(self, request: str) -> WallFeatureDetectionResponse:
-        results = self.model.predict(request, save=True,name="../../"+request.replace(".png",".features"), conf=0.5)
+        results = self.model.predict(request, save=True,name="../../"+request.replace(".png",".features"), conf=0.5,verbose=False)
 
         response = WallFeatureDetectionResponse()
         for res in results:

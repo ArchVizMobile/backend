@@ -5,6 +5,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        #data>div {
+            /* Walls */
+            background: rgb(0, 0, 0);
+            position: absolute;
+        }
+
+        #data>div>div {
+            /* Gaps */
+            background: #eee;
+            position: absolute;
+        }
+
+        #data>div>span {
+            /* Features */
+            position: absolute
+        }
+
+        h3 {
+            position: fixed;
+            background: #fff;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            margin: 0;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
 </head>
 
 <body>
@@ -13,68 +43,70 @@
     <script>
         fetch("http://api.lisha-app.com:1234/floorplan/list").then(e => e.json()).then(data => {
             fetch(`http://api.lisha-app.com:1234/floorplan?id=${data.list.at(-1).id}`).then(e => e.json()).then(data => {
+                console.log(data)
                 run(data)
             })
         })
+
+        FLOOR = 1
 
         function run(data) {
             document.getElementById("title").innerText = data.name
             dataDiv = document.getElementById("data")
             dataDiv.style.width = `${Math.ceil(data.floors.fromPosition.x + data.floors.toPosition.x)}px`
             dataDiv.style.height = `${Math.ceil(data.floors.fromPosition.y + data.floors.toPosition.y)}px`
-            // dataDiv.style.background = `#eee`
 
-            data.walls.filter(w => w.startHeight === 0).map((wall, wallIdx) => {
-                const div = document.createElement("div")
-                div.setAttribute("data-json", JSON.stringify(wall))
-                div.style.background = "#000"
-                div.style.position = "absolute"
-                div.style.top = `${wall.fromPosition.y}px`
-                div.style.left = `${wall.fromPosition.x}px`
-                // div.innerText = `Wand ${wallIdx}`
+            data.walls.filter(w => w.startHeight === 300 * (FLOOR - 1)).map((wall, wallIdx) => {
+                const wallDiv = document.createElement("div")
+                wallDiv.setAttribute("data-json", JSON.stringify(wall))
+                wallDiv.style.top = `${wall.fromPosition.y}px`
+                wallDiv.style.left = `${wall.fromPosition.x}px`
 
                 if (wall.isHorizontal) {
-                    div.style.width = `${wall.toPosition.x - wall.fromPosition.x}px`
-                    div.style.height = `${wall.depth}px`
+                    wallDiv.style.width = `${wall.toPosition.x - wall.fromPosition.x}px`
+                    wallDiv.style.height = `${wall.depth}px`
                 } else {
-                    div.style.height = `${wall.toPosition.y - wall.fromPosition.y}px`
-                    div.style.width = `${wall.depth}px`
+                    wallDiv.style.height = `${wall.toPosition.y - wall.fromPosition.y}px`
+                    wallDiv.style.width = `${wall.depth}px`
                 }
-                wall.features.map(feature => {
-                    const box = document.createElement("div")
-                    box.setAttribute("data-json", JSON.stringify(feature))
-                    // fromPosition: 67.4375
-                    // height: 220
-                    // hinge: -1
-                    // openLeft: false
-                    // style: "door"
-                    // toPosition: 113.28125
-                    // type: "door"
-                    // z: 0
 
-                    box.style.background = feature.type === "door" ? "#f00" : "#00f"
-                    box.style.position = "absolute"
-                    // box.innerText = feature.type
+                wall.gaps.map(gap => {
+                    const gapBox = document.createElement("div")
+                    gapBox.setAttribute("data-json", JSON.stringify(gap))
+                    if (wall.isHorizontal) {
+                        gapBox.style.left = `${gap.fromPosition}px`
+                        gapBox.style.width = `${gap.toPosition - gap.fromPosition}px`
+                        gapBox.style.height = `${wall.depth}px`
+                    } else {
+                        gapBox.style.top = `${gap.fromPosition}px`
+                        gapBox.style.height = `${gap.toPosition - gap.fromPosition}px`
+                        gapBox.style.width = `${wall.depth}px`
+                    }
+                    return gapBox
+
+                }).forEach(item => wallDiv.appendChild(item))
+
+                wall.features.map(feature => {
+                    const featureBox = document.createElement("span")
+                    featureBox.setAttribute("data-json", JSON.stringify(feature))
+
+                    featureBox.style.background = feature.type === "door" ? "#f00" : "#00f"
+
 
                     if (wall.isHorizontal) {
-                        box.style.left = `${feature.fromPosition}px`
-                        box.style.width = `${feature.toPosition - feature.fromPosition}px`
-                        box.style.height = `${wall.depth}px`
+                        featureBox.style.left = `${feature.fromPosition}px`
+                        featureBox.style.width = `${feature.toPosition - feature.fromPosition}px`
+                        featureBox.style.height = `${wall.depth}px`
                     } else {
-                        box.style.top = `${feature.fromPosition}px`
-                        box.style.height = `${feature.toPosition - feature.fromPosition}px`
-                        box.style.width = `${wall.depth}px`
+                        featureBox.style.top = `${feature.fromPosition}px`
+                        featureBox.style.height = `${feature.toPosition - feature.fromPosition}px`
+                        featureBox.style.width = `${wall.depth}px`
                     }
-                    return box
+                    return featureBox
 
-                }).forEach(item => {
-                    div.appendChild(item)
-                })
-                return div
-            }).forEach(div => {
-                dataDiv.appendChild(div)
-            });
-            // document.getElementById("data").inner
+                }).forEach(item => wallDiv.appendChild(item))
+                return wallDiv
+            }).forEach(wallDiv => dataDiv.appendChild(wallDiv))
         }
     </script>
 </body>
