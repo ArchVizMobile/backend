@@ -41,14 +41,20 @@
     <h3 id="title"></h3>
     <div id="data"></div>
     <script>
-        fetch("http://api.lisha-app.com:1234/floorplan/list").then(e => e.json()).then(data => {
-            fetch(`http://api.lisha-app.com:1234/floorplan?id=${data.list.at(-1).id}`).then(e => e.json()).then(data => {
-                console.log(data)
-                run(data)
-            })
+        // fetch("http://api.lisha-app.com:1234/floorplan/list").then(e => e.json()).then(data => {
+        //     fetch(`http://api.lisha-app.com:1234/floorplan?id=${data.list.at(-1).id}`).then(e => e.json()).then(data => {
+        //         console.log(data)
+        //         run(data)
+        //     })
+        // })
+        fetch("http://api.lisha-app.com:1234/floorplan/last").then(e => e.json()).then(data => {
+            // fetch(`http://api.lisha-app.com:1234/floorplan?id=${data.list.at(-1).id}`).then(e => e.json()).then(data => {
+            console.log(data)
+            run(data)
+            // })
         })
 
-        FLOOR = 2
+        FLOOR = 1
 
         function run(data) {
             document.getElementById("title").innerText = data.name
@@ -72,7 +78,7 @@
                 .filter(w => w.startHeight === 300 * (FLOOR - 1))
                 .map((wall, wallIdx) => {
                     const wallDiv = document.createElement("div")
-                    wallDiv.setAttribute("data-json", JSON.stringify(wall))
+                    wallDiv.setAttribute("data-json", JSON.stringify(wall).replace(/\"/isg, "'"))
                     wallDiv.style.top = `${wall.fromPosition.y}px`
                     wallDiv.style.left = `${wall.fromPosition.x}px`
 
@@ -102,7 +108,7 @@
 
                     wall.features.map(feature => {
                         const featureBox = document.createElement("span")
-                        featureBox.setAttribute("data-json", JSON.stringify(feature))
+                        featureBox.setAttribute("data-json", JSON.stringify(feature).replace(/\"/isg, "'"))
 
                         featureBox.style.background = feature.type === "door" ? "#f00" : "#00f"
 

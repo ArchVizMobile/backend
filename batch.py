@@ -316,10 +316,10 @@ SCALE = 3.5
 # print(entry_gap)
 # print(SCALE_FACTOR)
 # entry_json = {
-#     "top": entry_gap.fr.y,
-#     "left": entry_gap.to.x,
-#     "height": entry_gap.to.y-entry_gap.fr.y,
-#     "width": entry_gap.fr.x-entry_gap.to.x,
+#     "top": entry_gap.fr.y*SCALE,
+#     "left": entry_gap.to.x*SCALE,
+#     "height": entry_gap.to.y-entry_gap.fr.y*SCALE,
+#     "width": entry_gap.fr.x-entry_gap.to.x*SCALE,
 # }
 # print(entry_json)
 
@@ -328,7 +328,7 @@ response = {
   "name": f"Grundriss von {file} generiert am {time.strftime('%X %x')}",
   "walls": [],
   "junctions": [],
-#   "entry":entry_json,
+  "entry":entry_json,
   "rooms": [],
   "furniture": [],
   "scale": SCALE,
@@ -426,6 +426,7 @@ for idx,plan in enumerate(floorplans):
                 "height": 220,
                 "type": feature.cls
             })
+        w["features"] = sorted(w["features"],key=lambda k:k["fromPosition"])
         response["walls"].append(w)
     for item in plan.furniture:
         response["furniture"].append({
