@@ -286,6 +286,12 @@ response_timer = Timer("Response")
 TARGET_CEILING_HEIGHT = 300
 
 SCALE = 3.5
+entry_json = {
+    "top": 0,
+    "left": 0,
+    "height": 0,
+    "width": 0,
+}
 
 # entries:List[Wall] = []
 # for plan in floorplans:
@@ -328,7 +334,7 @@ response = {
   "name": f"Grundriss von {file} generiert am {time.strftime('%X %x')}",
   "walls": [],
   "junctions": [],
-  "entry":entry_json,
+#   "entry":entry_json,
   "rooms": [],
   "furniture": [],
   "scale": SCALE,
