@@ -334,7 +334,7 @@ response = {
   "name": f"Grundriss von {file} generiert am {time.strftime('%X %x')}",
   "walls": [],
   "junctions": [],
-#   "entry":entry_json,
+  "entry":entry_json,
   "rooms": [],
   "furniture": [],
   "scale": SCALE,
