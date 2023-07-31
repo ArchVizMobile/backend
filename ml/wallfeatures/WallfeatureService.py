@@ -18,7 +18,8 @@ class Classes(StrEnum):
     DOUBLEDOOR = "doubleDoor"
     ROOFWALL = "roofWall"
     ROOFWINDOW = "roofWindow"
-
+    ENTRYDOOR = "entryDoor"
+    OUTERDOOR = "outerDoor"
 @dataclass
 class WallFeatureDetectionRequest:
     image: str
@@ -31,7 +32,8 @@ class WallFeatureDetectionResponse:
     doubleDoor: List[YoloResponse] = None
     roofWall: List[YoloResponse] = None
     roofWindow: List[YoloResponse] = None
-
+    entryDoor: List[YoloResponse] = None
+    outerDoor: List[YoloResponse] = None
 
 class WallFeatureService:
     def __init__(self, model_data: ModelData):
@@ -77,6 +79,14 @@ class WallFeatureService:
                         if response.roofWindow is None:
                             response.roofWindow = []
                         response.roofWindow.append(obj)
+                    case Classes.ENTRYDOOR:
+                        if response.entryDoor is None:
+                            response.entryDoor = []
+                        response.entryDoor.append(obj)
+                    case Classes.OUTERDOOR:
+                        if response.outerDoor is None:
+                            response.outerDoor = []
+                        response.outerDoor.append(obj)
 
         # with open('detected_objects_wallfeatures.json', 'w') as f:
         #     json.dump(response, f, cls=DataClassJsonEncoder)

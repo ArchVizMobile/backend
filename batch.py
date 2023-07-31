@@ -212,6 +212,22 @@ for idx,floor in enumerate(out):
                 gap = wall.hasGap(fr,to)
                 if gap!=None:
                     wall.addDoor(Door(gap.fr,gap.to,obj))
+                    
+    if floor['wallfeatures'].entryDoor!=None:
+        for door in floor['wallfeatures'].entryDoor:
+            fr,to,obj = getPointsByItem(door,idx)
+            for wall in floorplans[idx].walls:
+                gap = wall.hasGap(fr,to)
+                if gap!=None:
+                    wall.addDoor(Door(gap.fr,gap.to,obj))
+
+    if floor['wallfeatures'].outerDoor!=None:
+        for door in floor['wallfeatures'].outerDoor:
+            fr,to,obj = getPointsByItem(door,idx)
+            for wall in floorplans[idx].walls:
+                gap = wall.hasGap(fr,to)
+                if gap!=None:
+                    wall.addDoor(Door(gap.fr,gap.to,obj))
 
     # Furniture
 
