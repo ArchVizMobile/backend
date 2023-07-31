@@ -52,6 +52,7 @@ class Floorplan:
         self.width = width
         self.maxHeight = maxHeight
         self.walls:List[Wall] = []
+        self.outerWalls:List[Wall] = []
         self.furniture:List[Furniture] = []
 
         for line in svg:
@@ -59,6 +60,10 @@ class Floorplan:
                 wall = getWallInformationBySVG(line)
                 if wall!=None:
                     self.walls.append(wall)
+            if outer_wall.check(line):
+                wall = getWallInformationBySVG(line)
+                if wall!=None:
+                    self.outerWalls.append(wall)
 
     def __repr__(self) -> str:
         return f"Floorplan({self.image})"
