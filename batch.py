@@ -15,7 +15,7 @@ from utils.hvh.parse import Door, Gap, MinMaxValue, Point, Point3D, Wall, Window
 dir = glob.glob("uploaded/*.pdf")
 file = dir[random.randint(0, len(dir)-1)].replace('\\','/')
 
-# file = "uploaded/Calvus 631.pdf"
+file = "uploaded/Calvus 631.pdf"
 
 header_bar = Color("87.889099%,92.576599%,96.484375%")
 outer_wall = Color("83.59375%,83.59375%,83.59375%")
@@ -28,6 +28,8 @@ footerHeightOffset = 10
 
 IMAGE_SCALE_FACTOR = 4
 TARGET_DOOR_WIDTH = 113
+TARGET_CEILING_HEIGHT = 250
+SCALE = 1
 
 class Furniture:
     def __init__(self,fr:Point,to:Point,obj:str) -> None:
@@ -309,9 +311,6 @@ for idx,floor in enumerate(out):
 print(detect_timer)
 response_timer = Timer("Response")
 
-TARGET_CEILING_HEIGHT = 300
-
-SCALE = 1
 entry_json = {
     "top": 0,
     "left": 0,
@@ -319,42 +318,47 @@ entry_json = {
     "width": 0,
 }
 
-entries:List[Wall] = []
-for plan in floorplans:
-    for line in plan.svg:
-        if entry.check(line):
-            wall = getWallInformationBySVG(line)
-            # print(line)
-            # print(wall)
-            entries.append(wall)
-
-# print(entries)
-
-foundEntries = {}
-for entry in entries:
+try:
+    entries:List[Wall] = []
     for plan in floorplans:
-        for walls in plan.walls:
-            gap = walls.hasGap(Point(entry.min.x,entry.min.y),Point(entry.max.x,entry.max.y),10)
-            if gap!=None:
-                if gap.__str__() not in foundEntries:
-                    for d in walls.doors:
-                        if d.fr.x == gap.fr.x and d.fr.y == gap.fr.y and d.to.x == gap.to.x and d.to.y == gap.to.y:
-                            foundEntries[gap.__str__()] = gap
+        for line in plan.svg:
+            if entry.check(line):
+                wall = getWallInformationBySVG(line)
+                # print(line)
+                # print(wall)
+                entries.append(wall)
+
+    # print(entries)
+
+    foundEntries = {}
+    for entry in entries:
+        for plan in floorplans:
+            for walls in plan.walls:
+                gap = walls.hasGap(Point(entry.min.x,entry.min.y),Point(entry.max.x,entry.max.y),10)
+                if gap!=None:
+                    if gap.__str__() not in foundEntries:
+                        for d in walls.doors:
+                            if d.fr.x == gap.fr.x and d.fr.y == gap.fr.y and d.to.x == gap.to.x and d.to.y == gap.to.y:
+                                foundEntries[gap.__str__()] = gap
 
 
-entry_gap:Gap = foundEntries[list(foundEntries.keys())[0]]
-if entry_gap.to.x - entry_gap.fr.x > entry_gap.to.y - entry_gap.fr.y:
-    # Hozizontal
-    SCALE = TARGET_DOOR_WIDTH/(entry_gap.to.x - entry_gap.fr.x)
-else:
-    SCALE = TARGET_DOOR_WIDTH/(entry_gap.to.y - entry_gap.fr.y)
+    entry_gap:Gap = foundEntries[list(foundEntries.keys())[0]]
+    if entry_gap.to.x - entry_gap.fr.x > entry_gap.to.y - entry_gap.fr.y:
+        # Hozizontal
+        SCALE = TARGET_DOOR_WIDTH/(entry_gap.to.x - entry_gap.fr.x)
+    else:
+        SCALE = TARGET_DOOR_WIDTH/(entry_gap.to.y - entry_gap.fr.y)
 
-entry_json = {
-    "top": entry_gap.fr.y*SCALE,
-    "left": entry_gap.to.x*SCALE,
-    "height": entry_gap.to.y-entry_gap.fr.y*SCALE,
-    "width": entry_gap.fr.x-entry_gap.to.x*SCALE,
-}
+    # SCALE = SCALE * 1.2
+
+    entry_json = {
+        "top": entry_gap.fr.y*SCALE,
+        "left": entry_gap.to.x*SCALE,
+        "height": entry_gap.to.y-entry_gap.fr.y*SCALE,
+        "width": entry_gap.fr.x-entry_gap.to.x*SCALE,
+    }
+except:
+    pass
 
 response = {
   "success": True,
