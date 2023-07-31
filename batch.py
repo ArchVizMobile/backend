@@ -1,6 +1,7 @@
 import glob
 import os
 import time
+import random
 from typing import List
 from PIL import Image, ImageChops
 import jsonpickle
@@ -11,7 +12,10 @@ from routes.floorplan.hvh.parse.get import Color, getFooter, getHeaderBar
 from runPipeline import runPipeline
 from utils.hvh.parse import Door, Gap, MinMaxValue, Point, Point3D, Wall, Window, getAttributeDataFromSvg, getDataByLine, getWallInformationBySVG
 
-file = "uploaded/Calvus 631.pdf"
+dir = glob.glob("uploaded/*.pdf")
+file = dir[random.randint(0, len(dir)-1)].replace('\\','/')
+
+# file = "uploaded/Calvus 631.pdf"
 
 header_bar = Color("87.889099%,92.576599%,96.484375%")
 outer_wall = Color("83.59375%,83.59375%,83.59375%")
@@ -23,6 +27,7 @@ entry = Color("39.501953%,39.501953%,39.501953%")
 footerHeightOffset = 10
 
 IMAGE_SCALE_FACTOR = 4
+TARGET_DOOR_WIDTH = 113
 
 class Furniture:
     def __init__(self,fr:Point,to:Point,obj:str) -> None:
@@ -285,43 +290,50 @@ response_timer = Timer("Response")
 
 TARGET_CEILING_HEIGHT = 300
 
-SCALE = 3.5
+SCALE = 1
+entry_json = {
+    "top": 0,
+    "left": 0,
+    "height": 0,
+    "width": 0,
+}
 
-# entries:List[Wall] = []
-# for plan in floorplans:
-#     for line in plan.svg:
-#         if entry.check(line):
-#             wall = getWallInformationBySVG(line)
-#             # print(line)
-#             # print(wall)
-#             entries.append(wall)
+entries:List[Wall] = []
+for plan in floorplans:
+    for line in plan.svg:
+        if entry.check(line):
+            wall = getWallInformationBySVG(line)
+            # print(line)
+            # print(wall)
+            entries.append(wall)
 
-# foundEntries = {}
-# for entry in entries:
-#     for plan in floorplans:
-#         for walls in plan.walls:
-#             gap = wall.hasGap(Point(entry.min.x,entry.min.y),Point(entry.max.x,entry.max.y),10)
-#             if gap!=None:
-#                 foundEntries[gap.__str__()] = gap
+# print(entries)
 
-# TARGET_DOOR_WIDTH = 113
+foundEntries = {}
+for entry in entries:
+    for plan in floorplans:
+        for walls in plan.walls:
+            gap = walls.hasGap(Point(entry.min.x,entry.min.y),Point(entry.max.x,entry.max.y),10)
+            if gap!=None:
+                if gap.__str__() not in foundEntries:
+                    for d in walls.doors:
+                        if d.fr.x == gap.fr.x and d.fr.y == gap.fr.y and d.to.x == gap.to.x and d.to.y == gap.to.y:
+                            foundEntries[gap.__str__()] = gap
 
-# entry_gap:Gap = foundEntries[list(foundEntries.keys())[0]]
-# # if entry_gap.fr.x - entry_gap.to.x > entry_gap.fr.y - entry_gap.to.y:
-#     # Hozizontal
-#     # SCALE_FACTOR = (entry_gap.fr.x - entry_gap.to.x)
-# # else:
-#     # SCALE_FACTOR = (entry_gap.fr.y - entry_gap.to.y)
-# SCALE_FACTOR = TARGET_DOOR_WIDTH/(entry_gap.fr.y - entry_gap.to.y)
-# print(entry_gap)
-# print(SCALE_FACTOR)
-# entry_json = {
-#     "top": entry_gap.fr.y*SCALE,
-#     "left": entry_gap.to.x*SCALE,
-#     "height": entry_gap.to.y-entry_gap.fr.y*SCALE,
-#     "width": entry_gap.fr.x-entry_gap.to.x*SCALE,
-# }
-# print(entry_json)
+
+entry_gap:Gap = foundEntries[list(foundEntries.keys())[0]]
+if entry_gap.to.x - entry_gap.fr.x > entry_gap.to.y - entry_gap.fr.y:
+    # Hozizontal
+    SCALE = TARGET_DOOR_WIDTH/(entry_gap.to.x - entry_gap.fr.x)
+else:
+    SCALE = TARGET_DOOR_WIDTH/(entry_gap.to.y - entry_gap.fr.y)
+
+entry_json = {
+    "top": entry_gap.fr.y*SCALE,
+    "left": entry_gap.to.x*SCALE,
+    "height": entry_gap.to.y-entry_gap.fr.y*SCALE,
+    "width": entry_gap.fr.x-entry_gap.to.x*SCALE,
+}
 
 response = {
   "success": True,

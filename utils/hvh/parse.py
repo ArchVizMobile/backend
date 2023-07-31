@@ -250,6 +250,11 @@ class Wall:
                     self.gaps.append(Gap(Point(last.min.x,last.max.y),Point(item.max.x,item.min.y)))
             last = item
         
+        if self.isHorizontal:
+            self.gaps = sorted(self.gaps,key=lambda k: k.fr.x)
+        else:
+            self.gaps = sorted(self.gaps,key=lambda k: k.fr.y)
+
         self.windows:List[Window] = []
         self.doors:List[Door] = []
     
@@ -257,10 +262,22 @@ class Wall:
         box1 = Gap(Point(fr.x-offset,fr.y-offset),Point(to.x+offset,to.y+offset))
 
         for gap in self.gaps:
-            x = not (box1.fr.x > gap.to.x
-                or box1.to.x < gap.fr.x
-                or box1.fr.y > gap.to.y
-                or box1.to.y < gap.fr.y)
+            x = not (box1.fr.x >= gap.to.x
+                or box1.to.x <= gap.fr.x
+                or box1.fr.y >= gap.to.y
+                or box1.to.y <= gap.fr.y)
+            if x:
+                return gap
+        return None
+
+    def isGapInBox(self,fr:Point,to:Point,offset=2):
+        box1 = Gap(Point(to.x-offset,to.y-offset),Point(fr.x+offset,fr.y+offset))
+
+        for gap in self.gaps:
+            x = not (box1.fr.x <= gap.to.x
+                or box1.to.x >= gap.fr.x
+                or box1.fr.y <= gap.to.y
+                or box1.to.y >= gap.fr.y)
             if x:
                 return gap
         return None
